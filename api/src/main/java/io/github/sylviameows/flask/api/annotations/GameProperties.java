@@ -1,5 +1,6 @@
-package io.github.sylviameows.flask.api.game;
+package io.github.sylviameows.flask.api.annotations;
 
+import io.github.sylviameows.flask.api.map.FlaskMap;
 import org.bukkit.Material;
 
 import java.lang.annotation.ElementType;
@@ -17,4 +18,6 @@ public @interface GameProperties {
 
     int min();
     int max();
+
+    Class<? extends FlaskMap> map() default FlaskMap.class;
 }

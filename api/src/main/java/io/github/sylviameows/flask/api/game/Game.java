@@ -1,6 +1,7 @@
 package io.github.sylviameows.flask.api.game;
 
 import io.github.sylviameows.flask.api.FlaskPlugin;
+import io.github.sylviameows.flask.api.game.map.MapManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
@@ -38,6 +39,8 @@ public abstract class Game {
 
     abstract public Lobby<?> createLobby(List<Player> players);
     abstract public Phase initialPhase();
+
+    abstract public MapManager getMapManager();
 
     public Settings getSettings() {
         return settings;

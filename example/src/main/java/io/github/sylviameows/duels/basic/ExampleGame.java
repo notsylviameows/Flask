@@ -1,7 +1,9 @@
 package io.github.sylviameows.duels.basic;
 
 import io.github.sylviameows.flask.api.FlaskPlugin;
+import io.github.sylviameows.flask.api.annotations.GameProperties;
 import io.github.sylviameows.flask.api.game.*;
+import io.github.sylviameows.flask.api.game.map.MapManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -13,9 +15,12 @@ import java.util.List;
         color = 0x87ffdf, // mint color
         material = Material.WOODEN_SWORD,
         max = 2,
-        min = 2
+        min = 2,
+        map = ExampleMap.class
 )
 public class ExampleGame extends Game {
+    private MapManager mm;
+
     public ExampleGame(FlaskPlugin plugin) {
         super(plugin);
     }
@@ -28,5 +33,11 @@ public class ExampleGame extends Game {
     @Override
     public Phase initialPhase() {
         return new ExampleStartingPhase();
+    }
+
+    @Override
+    public MapManager getMapManager() {
+        if (mm == null) mm = new MapManager(this);
+        return mm;
     }
 }

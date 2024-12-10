@@ -1,6 +1,9 @@
 package io.github.sylviameows.flask.api.game;
 
+import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.Palette;
+import io.github.sylviameows.flask.api.annotations.GameProperties;
+import io.github.sylviameows.flask.api.map.FlaskMap;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.ApiStatus;
@@ -21,6 +24,7 @@ public final class Settings {
     // game options
     private final Integer maxPlayers;
     private final Integer minPlayers; // optional
+    private final Class<? extends FlaskMap> mapClass;
 
     private Settings(SettingsBuilder builder) {
         this.name = builder.name;
@@ -30,15 +34,18 @@ public final class Settings {
 
         this.maxPlayers = builder.maxPlayers;
         this.minPlayers = builder.minPlayers;
+
+        this.mapClass = builder.mapProperties;
     }
 
-    private Settings(String name, String description, TextColor color, Material material, Integer maxPlayers, Integer minPlayers) {
+    private Settings(String name, String description, TextColor color, Material material, Integer maxPlayers, Integer minPlayers, Class<? extends FlaskMap> mapProperties) {
         this.name = name;
         this.description = description;
         this.color = color;
         this.icon = material;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
+        this.mapClass = mapProperties;
     }
 
     public String getName() {
@@ -61,6 +68,22 @@ public final class Settings {
         return minPlayers;
     }
 
+    public Class<? extends FlaskMap> getMapClass() {
+        return mapClass;
+    }
+    public FlaskMap getFreshMap(String id) {
+        try {
+            var constructor = mapClass.getConstructor(String.class);
+            if (constructor.trySetAccessible()) {
+                return constructor.newInstance(id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     @ApiStatus.Internal
     public static Settings from(Game game) {
         GameProperties props = game.getClass().getAnnotation(GameProperties.class);
@@ -73,7 +96,8 @@ public final class Settings {
                 TextColor.color(props.color()),
                 props.material(),
                 props.min(),
-                props.max()
+                props.max(),
+                props.map()
         );
     }
 
@@ -105,6 +129,8 @@ public final class Settings {
         // game options
         private Integer maxPlayers = 8;
         private Integer minPlayers = 2;
+
+        private Class<? extends FlaskMap> mapProperties = FlaskMap.class;
 
         public SettingsBuilder() {}
 
@@ -153,6 +179,11 @@ public final class Settings {
          */
         public SettingsBuilder setMinPlayers(Integer min) {
             this.minPlayers = min;
+            return this;
+        }
+
+        public SettingsBuilder setMapProperties(Class<? extends FlaskMap> map) {
+            this.mapProperties = map;
             return this;
         }
 

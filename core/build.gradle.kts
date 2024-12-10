@@ -18,7 +18,7 @@ dependencies {
     implementation("com.infernalsuite.aswm:loaders:3.0.0-SNAPSHOT") // slime world loaders
     implementation(project(":flask-api"))
 
-    paperweight.paperDevBundle("1.21.1-R0.1-SNAPSHOT") // paper dependency
+    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT") // paper dependency
 }
 
 // defines usage of mojang mappings

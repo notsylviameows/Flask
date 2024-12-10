@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly(project(":flask-api"))
 
     compileOnly("com.infernalsuite.aswm:api:3.0.0-SNAPSHOT") // slime worlds api

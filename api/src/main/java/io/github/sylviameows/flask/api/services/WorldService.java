@@ -138,4 +138,55 @@ public interface WorldService {
     default SlimeWorld loadWorld(SlimeWorld world) {
         return loadWorld(world, true);
     }
+
+    /**
+     * Saves a world asynchronously.
+     * @param world the world to save.
+     * @return a promise that returns true when the world has been saved.
+     */
+    default CompletableFuture<Boolean> saveWorld(SlimeWorld world) {
+        var promise = new CompletableFuture<Boolean>();
+        var scheduler = Bukkit.getScheduler();
+
+        scheduler.runTaskAsynchronously(flask.getPlugin(), () -> {
+            try {
+                slime.saveWorld(world);
+                promise.complete(true);
+            } catch (IOException e) {
+                promise.complete(false);
+            }
+        });
+
+        return promise;
+    }
+
+    /**
+     * Creates an empty world with the given name. Should be run asynchronously.
+     * @param name
+     * @return a promise of the slime world.
+     */
+    SlimeWorld createWorld(String name, boolean readOnly, SlimePropertyMap properties) throws IOException;
+
+    default SlimeWorld createWorld(String name) throws IOException {
+        return createWorld(name, false, WorldProperties.defaultProperties());
+    }
+
+    default CompletableFuture<SlimeWorld> createWorldAsync(String name, boolean readOnly, SlimePropertyMap properties) {
+        var promise = new CompletableFuture<SlimeWorld>();
+        var scheduler = Bukkit.getScheduler();
+
+        scheduler.runTaskAsynchronously(flask.getPlugin(), () -> {
+            try {
+                promise.complete(createWorld(name,readOnly,properties));
+            } catch (IOException e) {
+                promise.completeExceptionally(e);
+            }
+        });
+
+        return promise;
+    }
+
+    default CompletableFuture<SlimeWorld> createWorldAsync(String name) {
+        return createWorldAsync(name, false, WorldProperties.defaultProperties());
+    }
 }

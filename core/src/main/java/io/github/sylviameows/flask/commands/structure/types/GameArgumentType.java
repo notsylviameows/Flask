@@ -13,6 +13,7 @@ import io.github.sylviameows.flask.api.game.Game;
 import io.github.sylviameows.flask.registries.GameRegistryImpl;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,6 +52,8 @@ public class GameArgumentType implements CustomArgumentType<Game, NamespacedKey>
             var message = new LiteralMessage("Invalid game argument.");
             throw new SimpleCommandExceptionType(message).createWithContext(reader);
         }
+
+//        ServerGamePacketListenerImpl
 
         return game;
     }

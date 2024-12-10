@@ -7,6 +7,7 @@ import io.github.sylviameows.flask.api.registry.GameRegistry;
 import io.github.sylviameows.flask.api.services.MessageService;
 import io.github.sylviameows.flask.api.services.WorldService;
 import io.github.sylviameows.flask.commands.SetSpawnCommand;
+import io.github.sylviameows.flask.commands.editor.EditorCommand;
 import io.github.sylviameows.flask.commands.hologram.HologramCommand;
 import io.github.sylviameows.flask.commands.queue.QueueCommand;
 import io.github.sylviameows.flask.hub.holograms.GameHologram;
@@ -61,7 +62,6 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
 
         Flask.messageService = new MessageServiceImpl(this);
         Flask.worldService = new FileWorldService();
-
         // commands
         registerCommands();
 
@@ -84,6 +84,7 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
             new QueueCommand().register(commands);
             new HologramCommand().register(commands);
             new SetSpawnCommand().register(commands);
+            new EditorCommand().register(commands);
         });
     }
 

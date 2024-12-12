@@ -14,7 +14,10 @@ import io.github.sylviameows.flask.api.util.WorldProperties;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -78,5 +81,13 @@ public class MapManager implements Manager<FlaskMap> {
 
     public FlaskMap remove(String key) {
         return map.remove(key);
+    }
+
+    public Set<String> keys() {
+        return map.keySet();
+    }
+
+    public Collection<FlaskMap> values() {
+        return map.values();
     }
 }

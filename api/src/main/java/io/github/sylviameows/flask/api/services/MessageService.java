@@ -12,7 +12,8 @@ public interface MessageService {
     enum MessageType {
         ERROR("errors."),
         STANDARD("messages."),
-        QUEUE("messages.queue.");
+        QUEUE("messages.queue."),
+        EDITOR("messages.editor.");
         private String value;
 
         MessageType(String value) {

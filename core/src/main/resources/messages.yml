@@ -4,13 +4,15 @@ colors:
 prefix:
   enabled: true
   default: "<color:$mint>🧪 › "
+  editor: "<yellow>✏️ › "
   error: "<red>🧪 › "
 
 errors:
   unknown: "<red>An unknown error occurred."
   no_permission: "<red>You do not have permission to use that command. <gray>(%s)"
   occupied: "<red>You are currently occupied!"
-  missing_arg: "<red>Missing the %s argument."
+  missing_arg: "<red>Missing argument: %s."
+  missing_args: "<red>Missing argument(s): %s."
   no_queue: "<red>You are not in a queue!"
   game_doesnt_exist: "<red>Could not find the game \"%s\", are you sure it exists?"
   template_doesnt_exist: "<red>Template \"%s\" couldn't be found, are you sure it exists?"
@@ -20,6 +22,34 @@ messages:
   created_hologram: "<white>Created a new hologram for <color:$mint>%s</color>!"
   removed_hologram: "<white>Successfully removed the hologram in front of you!"
   set_spawn: "<white>Successfully set spawn to your location."
+  editor:
+    no_session: "<red>You must be in an editor session to run this command." # error
+    book: "<white>Opened editor book for <color:$mint>%s</color>."
+    set: "<white>Set value of <color:$mint>%s</color> to <color:$mint>%s</color>."
+    session:
+      info: "<white>Currently modifying map <color:$mint>%s</color> for mode <color:$mint>%s</color>."
+      info_none: "<white>You are not currently in an editor session."
+      list:
+        header: "<b><color:$mint>Session editors list:</color></b>"
+        manager: "<white>%s <gray>(session manager)"
+        editor: "<white>%s"
+      open: "<white>Successfully started an editor session for <color:$mint>%s</color>. <gray>(MODE: %s)"
+      close: "<white>Successfully closed editor session for <color:$mint>%s</color>."
+      join: "<white>Successfully joined <color:$mint>%s's </color>editor session."
+      join_others: "<color:$mint>%s<white> joined the session."
+      leave: "<white>Successfully left editor session <color:$mint>%s</color>."
+      leave_others: "<color:$mint>%s<white> left the session."
+      kick:
+        issue: "<white>Successfully kicked <color:$mint>%s</color> from the session."
+        receive: "<white>You were kicked from <color:$mint>%s's</color> editor session!"
+      no_permission: "<red>You must be the session manager to run this command." # error
+      in_use: "<red>The specified map is already in use, ask %s if you can join their session to edit this map!" # error
+      occupied: "<red>You are already occupied in an editor session, leave it to start a new one!"
+      invite:
+        send: "<white>Sent an invite to <color:$mint>%s</color> to join the session."
+        receive: "<white><color:#87ffdf>%s</color> sent you an invite to join their editor session. <gray><hover:show_text:'<gray>MODE: %s <dark_gray>:|:</dark_gray> MAP: %s'>(details)</hover>"
+        receive_button: "<b><color:$mint>[ACCEPT]</color></b>"
+        other_occupied: "<white>Cannot invite <color:$mint>%s</color>, as they are currently busy." # error?
   queue:
     join: "<white>You are now in queue for <color:$mint>%s</color>!"
     other_join: "<white><color:$mint>%s</color> joined the queue."

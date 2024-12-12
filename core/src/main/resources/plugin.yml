@@ -24,6 +24,10 @@ permissions:
   flask.queue.leave:
     description: "This allows players to leave a queue."
 
+  # editors
+  flask.editor:
+    description: "allows players to access the map editor."
+
   # staff
   flask.holograms:
     description: "Allows a user to create and remove holograms."

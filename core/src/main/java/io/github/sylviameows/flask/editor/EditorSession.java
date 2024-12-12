@@ -92,14 +92,22 @@ public class EditorSession implements Listener {
         init();
     }
 
-    public void init() {
+    public Game getGame() {
+        return game;
+    }
+
+    public FlaskMap getMap() {
+        return map;
+    }
+
+    private void init() {
         book = new EditorBook(game, map);
 
         // registers our editor session events, unregistered when session closes.
         Bukkit.getPluginManager().registerEvents(this, Flask.getInstance().getPlugin());
     }
 
-    public void postWorld() {
+    private void postWorld() {
         manager.teleportAsync(world.getSpawnLocation()).whenComplete((success, ex) -> {
             if (ex != null) {
                 Flask.logger.warn(ex.getMessage());
@@ -109,7 +117,7 @@ public class EditorSession implements Listener {
         });
     }
 
-    public void postTeleport(Player player) {
+    private void postTeleport(Player player) {
         player.setGameMode(GameMode.CREATIVE);
 
         var editor_item = new ItemStack(Material.WRITTEN_BOOK);

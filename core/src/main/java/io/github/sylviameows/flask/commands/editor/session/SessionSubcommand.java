@@ -3,6 +3,7 @@ package io.github.sylviameows.flask.commands.editor.session;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.services.MessageService;
+import io.github.sylviameows.flask.commands.editor.session.management.CloseSession;
 import io.github.sylviameows.flask.commands.editor.session.management.OpenSession;
 import io.github.sylviameows.flask.commands.structure.CommandProperties;
 import io.github.sylviameows.flask.commands.structure.FlaskCommand;
@@ -16,6 +17,7 @@ public class SessionSubcommand extends FlaskCommand {
         super();
 
         addSubCommand(new OpenSession());
+        addSubCommand(new CloseSession());
     }
 
     @Override

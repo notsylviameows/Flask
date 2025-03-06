@@ -1,6 +1,7 @@
 package io.github.sylviameows.flask.managers;
 
 import io.github.sylviameows.flask.api.manager.Manager;
+import io.github.sylviameows.flask.api.map.FlaskMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

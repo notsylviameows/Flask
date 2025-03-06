@@ -4,6 +4,7 @@ import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.annotations.MapProperty;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.book.components.BookComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -26,9 +27,9 @@ abstract public class BookOption implements BookComponent {
     final boolean required;
 
     final Field field;
-    final FlaskMap map;
+    final GameMap map;
 
-    protected BookOption(Field field, FlaskMap map) {
+    protected BookOption(Field field, GameMap map) {
         this.field = field;
         this.map = map;
 

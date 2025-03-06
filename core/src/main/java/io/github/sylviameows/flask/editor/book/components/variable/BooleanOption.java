@@ -2,6 +2,7 @@ package io.github.sylviameows.flask.editor.book.components.variable;
 
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.book.EditorBook;
 import io.github.sylviameows.flask.editor.book.components.button.BookButton;
 import io.github.sylviameows.flask.editor.book.components.button.ButtonStyle;
@@ -13,7 +14,7 @@ import org.bukkit.Bukkit;
 import java.lang.reflect.Field;
 
 public class BooleanOption extends BookOption {
-    public BooleanOption(Field field, FlaskMap map) {
+    public BooleanOption(Field field, GameMap map) {
         super(field, map);
     }
 

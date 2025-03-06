@@ -3,6 +3,7 @@ package io.github.sylviameows.flask.editor.book;
 import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.game.Game;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.EditorUtilities;
 import io.github.sylviameows.flask.editor.book.components.variable.BookOption;
 import io.github.sylviameows.flask.editor.book.components.variable.BooleanOption;
@@ -15,11 +16,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class EditorBook {
-    private final Game game;
-    private final FlaskMap map;
+    private final Game<? extends GameMap> game;
+    private final GameMap map;
 
 
-    public EditorBook(Game game, FlaskMap map) {
+    public EditorBook(Game<? extends GameMap> game, GameMap map) {
         this.game = game;
         this.map = map;
     }

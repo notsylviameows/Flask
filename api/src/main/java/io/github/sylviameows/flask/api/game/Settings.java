@@ -4,9 +4,13 @@ import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.annotations.GameProperties;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * These are the base settings of a minigame, which tells Flask how to
@@ -14,7 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
  * use the {@link SettingsBuilder} class to create this object which can
  * be created with the {@link Settings#builder()} method.
  */
-public final class Settings {
+public final class Settings<T extends GameMap> {
     // display options
     private final String name;
     private final String description;
@@ -24,9 +28,9 @@ public final class Settings {
     // game options
     private final Integer maxPlayers;
     private final Integer minPlayers; // optional
-    private final Class<? extends FlaskMap> mapClass;
+    private final Class<T> mapClass;
 
-    private Settings(SettingsBuilder builder) {
+    private Settings(SettingsBuilder<T> builder) {
         this.name = builder.name;
         this.description = builder.description;
         this.color = builder.color;
@@ -35,10 +39,10 @@ public final class Settings {
         this.maxPlayers = builder.maxPlayers;
         this.minPlayers = builder.minPlayers;
 
-        this.mapClass = builder.mapProperties;
+        this.mapClass = fetchMapType(builder);
     }
 
-    private Settings(String name, String description, TextColor color, Material material, Integer maxPlayers, Integer minPlayers, Class<? extends FlaskMap> mapProperties) {
+    private Settings(String name, String description, TextColor color, Material material, Integer maxPlayers, Integer minPlayers, Class<T> mapProperties) {
         this.name = name;
         this.description = description;
         this.color = color;
@@ -68,10 +72,10 @@ public final class Settings {
         return minPlayers;
     }
 
-    public Class<? extends FlaskMap> getMapClass() {
+    public Class<T> getMapClass() {
         return mapClass;
     }
-    public FlaskMap getFreshMap(String id) {
+    public T getFreshMap(String id) {
         try {
             var constructor = mapClass.getConstructor(String.class);
             if (constructor.trySetAccessible()) {
@@ -85,30 +89,53 @@ public final class Settings {
     }
 
     @ApiStatus.Internal
-    public static Settings from(Game game) {
+    public static <S extends GameMap> Settings<S> from(Game<S> game) {
         GameProperties props = game.getClass().getAnnotation(GameProperties.class);
         if (props == null) {
             throw new IllegalArgumentException("Provided game does not contain properties needed.");
         }
-        return new Settings(
+
+        Class<S> map = fetchMapType(game);
+        return new Settings<>(
                 props.name(),
                 props.description(),
                 TextColor.color(props.color()),
                 props.material(),
                 props.min(),
                 props.max(),
-                props.map()
+                map
         );
     }
 
-
-    public static SettingsBuilder builder() {
-        return new SettingsBuilder();
+    @ApiStatus.Internal
+    private static <S extends GameMap> Class<S> fetchMapType(Game<S> game) {
+        return fetchMapType(game.getClass());
     }
 
+    @ApiStatus.Internal
+    private static <S extends GameMap> Class<S> fetchMapType(SettingsBuilder<S> builder) {
+        return fetchMapType(builder.getClass());
+    }
 
-    public static Settings of(String name, String description, TextColor color, Material icon, Integer max, Integer min) {
-        return new SettingsBuilder()
+    @ApiStatus.Internal
+    private static <S extends GameMap> Class<S> fetchMapType(Class<?> clazz) {
+        Type type = clazz.getGenericSuperclass();
+        if (!(type instanceof ParameterizedType parameterizedType)) {
+            throw new IllegalArgumentException("No parameterized type was found!");
+        }
+
+        var mapType = parameterizedType.getActualTypeArguments()[0];
+        @SuppressWarnings("unchecked") // these classes should always match.
+        Class<S> map = (Class<S>) mapType;
+        return map;
+    }
+
+    public static <S extends GameMap> SettingsBuilder<S> builder() {
+        return new SettingsBuilder<>();
+    }
+
+    public static <S extends GameMap> Settings<S> of(String name, String description, TextColor color, Material icon, Integer max, Integer min) {
+        return new SettingsBuilder<S>()
                 .setName(name)
                 .setDescription(description)
                 .setColor(color)
@@ -119,7 +146,7 @@ public final class Settings {
     }
 
 
-    public static class SettingsBuilder {
+    public static class SettingsBuilder<T extends GameMap> {
         // display options
         private String name = "Unknown";
         private String description = "";
@@ -130,14 +157,12 @@ public final class Settings {
         private Integer maxPlayers = 8;
         private Integer minPlayers = 2;
 
-        private Class<? extends FlaskMap> mapProperties = FlaskMap.class;
-
         public SettingsBuilder() {}
 
         /**
          *  default value: "Unknown"
          */
-        public SettingsBuilder setName(String name) {
+        public SettingsBuilder<T> setName(String name) {
             this.name = name;
             return this;
         }
@@ -145,7 +170,7 @@ public final class Settings {
         /**
          *  default value: ""
          */
-        public SettingsBuilder setDescription(String description) {
+        public SettingsBuilder<T> setDescription(String description) {
             this.description = description;
             return this;
         }
@@ -153,7 +178,7 @@ public final class Settings {
         /**
          *  default value: {@link Palette#WHITE}
          */
-        public SettingsBuilder setColor(TextColor color) {
+        public SettingsBuilder<T> setColor(TextColor color) {
             this.color = color;
             return this;
         }
@@ -161,7 +186,7 @@ public final class Settings {
         /**
          *  default value: {@link Material#ENDER_PEARL}
          */
-        public SettingsBuilder setIcon(Material icon) {
+        public SettingsBuilder<T> setIcon(Material icon) {
             this.icon = icon;
             return this;
         }
@@ -169,7 +194,7 @@ public final class Settings {
         /**
          *  default value: 8
          */
-        public SettingsBuilder setMaxPlayers(Integer max) {
+        public SettingsBuilder<T> setMaxPlayers(Integer max) {
             this.maxPlayers = max;
             return this;
         }
@@ -177,21 +202,17 @@ public final class Settings {
         /**
          *  default value: 2
          */
-        public SettingsBuilder setMinPlayers(Integer min) {
+        public SettingsBuilder<T> setMinPlayers(Integer min) {
             this.minPlayers = min;
-            return this;
-        }
-
-        public SettingsBuilder setMapProperties(Class<? extends FlaskMap> map) {
-            this.mapProperties = map;
             return this;
         }
 
         /**
          * @return a new {@link Settings} object with the specified settings.
+         * @throws IllegalArgumentException if map properties were not set.
          */
-        public Settings build() {
-            return new Settings(this);
+        public Settings<T> build() {
+            return new Settings<>(this);
         }
     }
 }

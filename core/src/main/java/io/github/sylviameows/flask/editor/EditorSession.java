@@ -4,7 +4,9 @@ import com.infernalsuite.aswm.api.world.SlimeWorld;
 import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.game.Game;
+import io.github.sylviameows.flask.api.game.map.MapManager;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.api.services.WorldService;
 import io.github.sylviameows.flask.editor.book.EditorBook;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
@@ -28,15 +30,15 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditorSession implements Listener {
+public class EditorSession<T extends GameMap> implements Listener {
     private final Player manager;
     private final ArrayList<Player> editors = new ArrayList<>();
-//
+
     private SlimeWorld slime;
     private World world;
 
-    private final FlaskMap map;
-    private final Game game;
+    private final T map;
+    private final Game<T> game;
 
     private final WorldService ws = Flask.getInstance().getWorldService();
 
@@ -45,12 +47,14 @@ public class EditorSession implements Listener {
 
     private final NamespacedKey ITEM_KEY = new NamespacedKey(Flask.getInstance().getPlugin(), "editor_item");
 
-    public EditorSession(Player player, Game game, String id) {
+    public EditorSession(Player player, Game<T> game, String id) {
         this.manager = player;
         editors.add(player);
 
         this.game = game;
+
         var mm = game.getMapManager();
+
         if (mm.get(id) != null) {
             this.map = mm.get(id);
         } else {
@@ -58,7 +62,9 @@ public class EditorSession implements Listener {
             mm.add(id, this.map);
         }
 
-        mm.getWorld(map).whenComplete((w, ex) -> {
+        assert map != null;
+
+        mm.getWorld(map.getId()).whenComplete((w, ex) -> {
             if (ex != null || w == null) {
                 throw new RuntimeException(ex);
             }
@@ -71,7 +77,7 @@ public class EditorSession implements Listener {
         init();
     }
 
-    public EditorSession(Player player, Game game, FlaskMap map) {
+    public EditorSession(Player player, Game<T> game, T map) {
         this.manager = player;
         editors.add(player);
 
@@ -92,11 +98,11 @@ public class EditorSession implements Listener {
         init();
     }
 
-    public Game getGame() {
+    public Game<T> getGame() {
         return game;
     }
 
-    public FlaskMap getMap() {
+    public T getMap() {
         return map;
     }
 
@@ -141,10 +147,13 @@ public class EditorSession implements Listener {
     }
 
     public void close() {
-        save();
+        ws.saveWorld(slime).whenComplete((success, ex) -> {
+            Bukkit.unloadWorld(world, false);
+        });
 
         // unregisters our events for this session
         HandlerList.unregisterAll(this);
+        world.getPlayers().forEach(p -> p.teleportAsync(Flask.getInstance().getSpawnLocation()));
     }
 
     @EventHandler

@@ -3,13 +3,14 @@ package io.github.sylviameows.flask.api.map;
 import io.github.sylviameows.flask.api.annotations.MapProperty;
 import org.bukkit.Location;
 
-public class FlaskMap {
+public class FlaskMap implements GameMap {
     public final String id;
 
     public FlaskMap(String id) {
         this.id = id;
     }
 
+    @Override
     public String getId() {
         return id;
     }

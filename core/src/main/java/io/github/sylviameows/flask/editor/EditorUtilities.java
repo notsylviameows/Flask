@@ -4,6 +4,7 @@ import io.github.sylviameows.flask.api.FlaskPlayer;
 import io.github.sylviameows.flask.api.annotations.MapProperty;
 import io.github.sylviameows.flask.api.game.Game;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.players.FlaskPlayerImpl;
 
 import java.lang.annotation.Annotation;
@@ -13,11 +14,11 @@ import java.util.ArrayList;
 public class EditorUtilities {
 
 
-    public static ArrayList<Field> getMapProperties(Game game) {
+    public static ArrayList<Field> getMapProperties(Game<? extends GameMap> game) {
         return getMapProperties(game.getSettings().getMapClass());
     }
 
-    public static ArrayList<Field> getMapProperties(Class<? extends FlaskMap> map) {
+    public static ArrayList<Field> getMapProperties(Class<? extends GameMap> map) {
         return getFieldsMatchingAnnotation(map, MapProperty.class);
     }
 
@@ -40,11 +41,11 @@ public class EditorUtilities {
     }
 
 
-    public static void setSession(FlaskPlayer player, EditorSession session) {
+    public static void setSession(FlaskPlayer player, EditorSession<? extends GameMap> session) {
         ((FlaskPlayerImpl) player).setSession(session);
     }
 
-    public static EditorSession getSession(FlaskPlayer player) {
+    public static EditorSession<? extends GameMap> getSession(FlaskPlayer player) {
         return ((FlaskPlayerImpl) player).getSession();
     }
 

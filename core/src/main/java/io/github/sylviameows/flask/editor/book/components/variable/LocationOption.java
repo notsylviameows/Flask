@@ -2,6 +2,7 @@ package io.github.sylviameows.flask.editor.book.components.variable;
 
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.book.components.button.BookButton;
 import io.github.sylviameows.flask.editor.book.components.button.ButtonStyle;
 import net.kyori.adventure.identity.Identity;
@@ -12,7 +13,7 @@ import org.bukkit.Location;
 import java.lang.reflect.Field;
 
 public class LocationOption extends BookOption {
-    public LocationOption(Field field, FlaskMap map) {
+    public LocationOption(Field field, GameMap map) {
         super(field, map);
     }
 

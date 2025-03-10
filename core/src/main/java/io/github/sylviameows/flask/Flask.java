@@ -2,6 +2,7 @@ package io.github.sylviameows.flask;
 
 import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.FlaskPlugin;
+import io.github.sylviameows.flask.api.events.FlaskDispatcher;
 import io.github.sylviameows.flask.api.manager.PlayerManager;
 import io.github.sylviameows.flask.api.registry.GameRegistry;
 import io.github.sylviameows.flask.api.services.MessageService;
@@ -11,6 +12,7 @@ import io.github.sylviameows.flask.commands.editor.EditorCommand;
 import io.github.sylviameows.flask.commands.hologram.HologramCommand;
 import io.github.sylviameows.flask.commands.queue.QueueCommand;
 import io.github.sylviameows.flask.hub.holograms.GameHologram;
+import io.github.sylviameows.flask.listeners.FlaskDispatcherImpl;
 import io.github.sylviameows.flask.listeners.JoinListener;
 import io.github.sylviameows.flask.listeners.LeaveListener;
 import io.github.sylviameows.flask.listeners.RightClickEntity;
@@ -44,6 +46,7 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     private static MessageServiceImpl messageService;
     private static WorldService worldService;
     private static Flask instance;
+    private static FlaskDispatcherImpl dispatcher;
 
     @Override
     public void onEnable() {
@@ -60,8 +63,10 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
         JoinListener.register(this);
         LeaveListener.register(this);
 
+        Flask.dispatcher = new FlaskDispatcherImpl();
         Flask.messageService = new MessageServiceImpl(this);
         Flask.worldService = new FileWorldService();
+
         // commands
         registerCommands();
 
@@ -154,6 +159,11 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     @Override
     public MessageService getMessageService() {
         return messageService;
+    }
+
+    @Override
+    public FlaskDispatcher getDispatcher() {
+        return dispatcher;
     }
 
     @Override

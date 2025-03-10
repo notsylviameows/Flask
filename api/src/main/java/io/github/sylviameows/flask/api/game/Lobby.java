@@ -5,14 +5,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Lobby<G extends Game> {
+public class Lobby<G extends Game<?>> {
     protected final G parent;
 
     public List<Player> players;
@@ -21,36 +20,32 @@ public class Lobby<G extends Game> {
     private World world;
 
     public Lobby(G parent) {
-        this.parent = parent;
-        this.players = new ArrayList<>();
-
-        this.phase = parent.initialPhase();
-        Bukkit.getPluginManager().registerEvents(this.phase, parent.getPlugin());
-        this.phase.onEnabled(this);
+        this(parent, new ArrayList<>());
     }
 
     public Lobby(G parent, List<Player> players) {
         this.parent = parent;
         this.players = players;
 
-        var api = parent.getPlugin().getFlaskAPI();
+        FlaskAPI api = parent.getPlugin().getFlaskAPI();
         players.forEach(player -> api.getPlayerManager().get(player).setLobby(this));
 
         this.phase = parent.initialPhase();
-        Bukkit.getPluginManager().registerEvents(this.phase, parent.getPlugin());
+        api.getPlugin().getLogger().info("registering");
+        api.getDispatcher().registerEvent(this, this.phase);
         this.phase.onEnabled(this);
     }
 
     // todo: call function in phase
     public void addPlayer(Player player) {
-        var api = parent.getPlugin().getFlaskAPI();
+        FlaskAPI api = parent.getPlugin().getFlaskAPI();
         api.getPlayerManager().get(player).setLobby(this);
         players.add(player);
         phase.onPlayerJoin(player);
     }
 
     public void removePlayer(Player player) {
-        var api = parent.getPlugin().getFlaskAPI();
+        FlaskAPI api = parent.getPlugin().getFlaskAPI();
         api.getPlayerManager().get(player).setLobby(null);
         players.remove(player);
         phase.onPlayerLeave(player);
@@ -58,7 +53,9 @@ public class Lobby<G extends Game> {
 
     public void closeLobby() {
         phase.onDisabled();
-        HandlerList.unregisterAll(phase);
+
+        FlaskAPI.instance().getPlugin().getLogger().info("unregistering");
+        FlaskAPI.instance().getDispatcher().unregisterEvent(this, phase);
 
         // todo: replace with a requeue feature?
         players.forEach(player -> {
@@ -86,12 +83,14 @@ public class Lobby<G extends Game> {
     }
     public void updatePhase(@NotNull Phase phase) {
         this.phase.onDisabled();
-        HandlerList.unregisterAll(this.phase);
+        FlaskAPI.instance().getPlugin().getLogger().info("unregistering");
+        FlaskAPI.instance().getDispatcher().unregisterEvent(this, phase);
 
         this.phase = phase;
 
         this.phase.onEnabled(this);
-        Bukkit.getPluginManager().registerEvents(this.phase, parent.getPlugin());
+        FlaskAPI.instance().getPlugin().getLogger().info("registering");
+        FlaskAPI.instance().getDispatcher().registerEvent(this, phase);
     }
 
     public void nextPhase() {

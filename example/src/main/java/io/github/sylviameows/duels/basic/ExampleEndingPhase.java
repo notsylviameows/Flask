@@ -1,6 +1,7 @@
 package io.github.sylviameows.duels.basic;
 
 import io.github.sylviameows.flask.api.Palette;
+import io.github.sylviameows.flask.api.annotations.FlaskEvent;
 import io.github.sylviameows.flask.api.game.Lobby;
 import io.github.sylviameows.flask.api.game.Phase;
 import net.kyori.adventure.key.Key;
@@ -12,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.time.Duration;
@@ -86,12 +86,10 @@ public class ExampleEndingPhase implements Phase {
         }
     }
 
-    @EventHandler
-    private void damage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (parent.players.contains(player)) {
-                event.setCancelled(true);
-            }
+    @FlaskEvent
+    public void damage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            event.setCancelled(true);
         }
     }
 

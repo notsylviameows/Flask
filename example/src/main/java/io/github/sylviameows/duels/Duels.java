@@ -3,7 +3,10 @@ package io.github.sylviameows.duels;
 import io.github.sylviameows.duels.basic.ExampleGame;
 import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.FlaskPlugin;
+import io.github.sylviameows.flask.api.game.Lobby;
 import org.bukkit.Bukkit;
+
+import java.util.ArrayList;
 
 public final class Duels extends FlaskPlugin {
     private FlaskAPI flask;
@@ -16,8 +19,12 @@ public final class Duels extends FlaskPlugin {
             flask = api;
         }
 
-        new ExampleGame(this).register("sword");
+        new ExampleGame(this).register("duel");
 
+        TestingGame eg = new TestingGame(this);
+        eg.register("test");
+
+        eg.createLobby(new ArrayList<>());
     }
 
     @Override

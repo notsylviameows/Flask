@@ -1,5 +1,6 @@
 package io.github.sylviameows.flask.api;
 
+import io.github.sylviameows.flask.api.events.FlaskDispatcher;
 import io.github.sylviameows.flask.api.manager.PlayerManager;
 import io.github.sylviameows.flask.api.registry.GameRegistry;
 import io.github.sylviameows.flask.api.services.MessageService;
@@ -13,6 +14,8 @@ public interface FlaskAPI {
     PlayerManager getPlayerManager();
     WorldService getWorldService();
     MessageService getMessageService();
+
+    FlaskDispatcher getDispatcher();
 
     Plugin getPlugin();
 

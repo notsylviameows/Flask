@@ -44,7 +44,7 @@ public class BooleanOption extends BookOption {
             var component = Component.text(value ? "True" : "False").color(Palette.DARK_GRAY);
             if (isOptional()) {
                 var d = (boolean) getDefault();
-                if (value == d) return component.append(Component.text("(default)").color(Palette.GRAY));
+                if (value == d) return component.append(Component.text(" (default)").color(Palette.GRAY));
             }
 
             return component;

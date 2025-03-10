@@ -1,9 +1,10 @@
 package io.github.sylviameows.flask.api.game;
 
+import io.github.sylviameows.flask.api.events.FlaskListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-public interface Phase extends Listener {
+public interface Phase extends FlaskListener {
     /* TODO */
 
     void onEnabled(Lobby<?> parent);

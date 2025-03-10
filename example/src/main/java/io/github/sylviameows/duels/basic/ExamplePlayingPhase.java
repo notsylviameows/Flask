@@ -1,11 +1,13 @@
 package io.github.sylviameows.duels.basic;
 
+import io.github.sylviameows.flask.api.annotations.FlaskEvent;
 import io.github.sylviameows.flask.api.game.Lobby;
 import io.github.sylviameows.flask.api.game.Phase;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class ExamplePlayingPhase implements Phase {
@@ -39,8 +41,8 @@ public class ExamplePlayingPhase implements Phase {
         parent.nextPhase();
     }
 
-    @EventHandler
-    private void onDeath(EntityDeathEvent event) {
+    @FlaskEvent
+    public void onDeath(EntityDeathEvent event) {
         if (event.getEntity() instanceof Player player) {
             if (player == playerA) {
                 nextPhase.setWinner(playerB);

@@ -1,21 +1,16 @@
 package io.github.sylviameows.flask.listeners;
 
 import io.github.sylviameows.flask.Flask;
-import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.FlaskPlayer;
 import io.github.sylviameows.flask.api.annotations.FlaskEvent;
 import io.github.sylviameows.flask.api.events.FlaskDispatcher;
 import io.github.sylviameows.flask.api.events.FlaskListener;
-import io.github.sylviameows.flask.api.game.Game;
 import io.github.sylviameows.flask.api.game.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.player.PlayerEvent;
@@ -33,24 +28,18 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
 
     @Override
     public void registerEvent(Lobby<?> lobby, FlaskListener listener) {
-        System.out.println("testing???");
-        Flask.logger.info("registering event: "+listener.getClass().getName());
-        for (Method method : listener.getClass().getMethods()) {
-            Flask.logger.info(method.getName() + " | " + Arrays.toString(method.getAnnotations()));
+        for (Method method : listener.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(FlaskEvent.class)) {
-                Flask.logger.info("found method with event annotation "+method.getName());
                 Parameter[] parameters = method.getParameters();
                 if (parameters.length == 1) {
                     Class<?> clazz = parameters[0].getType();
 
                     if (Event.class.isAssignableFrom(clazz)) {
-                        Flask.logger.info("is event type");
-
                         //noinspection unchecked
                         Class<? extends Event> eventClass = (Class<? extends Event>) clazz;
+                        method.setAccessible(true);
 
                         methodMap.computeIfAbsent(eventClass, k -> {
-                            Flask.logger.info("registering");
                             Bukkit.getPluginManager().registerEvent(
                                     eventClass,
                                     this,
@@ -75,15 +64,20 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
             ListenerInfo info = optional.get();
 
             listeners.remove(info);
-//            if (listeners.isEmpty()) todo(): remove empty listeners
+            if (listeners.isEmpty()) {
+                methodMap.remove(clazz);
+                // todo: find a way to unregister event fully
+            }
         });
     }
 
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
-        Flask.logger.info("running code: "+event.getEventName());
-        ArrayList<ListenerInfo> listeners = methodMap.get(event.getClass());
-        if (listeners == null || listeners.isEmpty()) return;
+        ArrayList<ListenerInfo> listeners = new ArrayList<>();
+
+        Class<? extends Event> clazz = event.getClass();
+        methodMap.forEach((e, i) -> {if (e.isAssignableFrom(clazz)) listeners.addAll(i);});
+        if (listeners.isEmpty()) return;
 
         ListenerInfo info = null;
         switch (event) {
@@ -92,14 +86,16 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
                 FlaskPlayer fp = Flask.getInstance().getPlayerManager().get(player);
 
                 Lobby<?> lobby = fp.getLobby();
-                Optional<ListenerInfo> optional = listeners.stream().filter(i -> i.lobby() == lobby).findFirst();
-                if (optional.isEmpty()) return;
-                info = optional.get();
+                for (ListenerInfo i : listeners) {
+                    if (i.lobby() == lobby) {
+                        info = i;
+                        break;
+                    }
+                }
             }
             case EntityEvent entityEvent -> {
                 Entity entity = entityEvent.getEntity();
                 World world = entity.getWorld();
-
                 info = findListenerMatchingWorld(listeners, world);
             }
             case WorldEvent worldEvent -> {
@@ -128,7 +124,11 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
     }
 
     private ListenerInfo findListenerMatchingWorld(ArrayList<ListenerInfo> listeners, World world) {
-        Optional<ListenerInfo> optional = listeners.stream().filter(i -> i.lobby().getWorld() == world).findFirst();
-        return optional.orElse(null);
+        for (ListenerInfo info : listeners) {
+            if (info.lobby().getWorld().getName().equals(world.getName())) {
+                return info;
+            }
+        }
+        return null;
     }
 }

@@ -23,7 +23,7 @@ public class MapManager<T extends GameMap> implements Manager<T> {
     protected final Map<String, T> map;
     protected final String prefix;
 
-    public MapManager(Game game, Class<T> clazz) {
+    public MapManager(Game<T> game, Class<T> clazz) {
         this(game.getKey().namespace()+"/"+game.getKey().value()+"/", clazz);
     }
 

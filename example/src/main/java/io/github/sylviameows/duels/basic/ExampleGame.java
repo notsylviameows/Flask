@@ -2,9 +2,10 @@ package io.github.sylviameows.duels.basic;
 
 import io.github.sylviameows.flask.api.FlaskPlugin;
 import io.github.sylviameows.flask.api.annotations.GameProperties;
-import io.github.sylviameows.flask.api.game.*;
+import io.github.sylviameows.flask.api.game.Game;
+import io.github.sylviameows.flask.api.game.Lobby;
+import io.github.sylviameows.flask.api.game.Phase;
 import io.github.sylviameows.flask.api.game.map.MapManager;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 

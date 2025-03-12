@@ -64,16 +64,27 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
             ListenerInfo info = optional.get();
 
             listeners.remove(info);
-            if (listeners.isEmpty()) {
-                methodMap.remove(clazz);
-                // todo: find a way to unregister event fully
+            if (!listeners.isEmpty()) {
+                return;
+            }
+
+            // unregister event when no lobby needs to listen to it.
+            methodMap.remove(clazz);
+            try {
+                Method method = clazz.getMethod("getHandlerList");
+                Object object = method.invoke(null);
+                if (object instanceof HandlerList handlerList) {
+                    handlerList.unregister(this);
+                }
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                Flask.logger.warn("Could not unregister listener for event type "+clazz.getName());
             }
         });
     }
 
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
-        ArrayList<ListenerInfo> listeners = new ArrayList<>();
+        List<ListenerInfo> listeners = new ArrayList<>();
 
         Class<? extends Event> clazz = event.getClass();
         methodMap.forEach((e, i) -> {if (e.isAssignableFrom(clazz)) listeners.addAll(i);});
@@ -83,18 +94,15 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
         switch (event) {
             case PlayerEvent playerEvent -> {
                 Player player = playerEvent.getPlayer();
-                FlaskPlayer fp = Flask.getInstance().getPlayerManager().get(player);
-
-                Lobby<?> lobby = fp.getLobby();
-                for (ListenerInfo i : listeners) {
-                    if (i.lobby() == lobby) {
-                        info = i;
-                        break;
-                    }
-                }
+                info = findListenerMatchingPlayer(listeners, player);
             }
             case EntityEvent entityEvent -> {
                 Entity entity = entityEvent.getEntity();
+                if (entity instanceof Player player) {
+                    info = findListenerMatchingPlayer(listeners, player);
+                    break;
+                }
+
                 World world = entity.getWorld();
                 info = findListenerMatchingWorld(listeners, world);
             }
@@ -123,7 +131,19 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
         }
     }
 
-    private ListenerInfo findListenerMatchingWorld(ArrayList<ListenerInfo> listeners, World world) {
+    private ListenerInfo findListenerMatchingPlayer(List<ListenerInfo> listeners, Player player) {
+        FlaskPlayer fp = Flask.getInstance().getPlayerManager().get(player);
+
+        Lobby<?> lobby = fp.getLobby();
+        for (ListenerInfo i : listeners) {
+            if (i.lobby() == lobby) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    private ListenerInfo findListenerMatchingWorld(List<ListenerInfo> listeners, World world) {
         for (ListenerInfo info : listeners) {
             if (info.lobby().getWorld().getName().equals(world.getName())) {
                 return info;

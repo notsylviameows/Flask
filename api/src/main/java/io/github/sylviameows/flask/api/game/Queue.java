@@ -18,7 +18,7 @@ import java.util.List;
  * available and meets the requirements in the game's {@link Settings}.
  * @param <G> the {@link Game} type this queue is meant for.
  */
-public class Queue<G extends Game> {
+public class Queue<G extends Game<?>> {
     private final G parent;
 
     private Integer totalPlayers;
@@ -28,7 +28,7 @@ public class Queue<G extends Game> {
 
     private final PlayerManager pm;
 
-    private BossBar bar;
+    private final BossBar bar;
 
     public Queue(G game) {
         this.parent = game;

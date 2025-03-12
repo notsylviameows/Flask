@@ -14,7 +14,7 @@ public interface MessageService {
         STANDARD("messages."),
         QUEUE("messages.queue."),
         EDITOR("messages.editor.");
-        private String value;
+        private final String value;
 
         MessageType(String value) {
             this.value = value;
@@ -27,5 +27,5 @@ public interface MessageService {
 
     void sendMessage(CommandSender sender, MessageType type, String key);
     void sendMessage(CommandSender sender, MessageType type, String key, Object... params);
-    void sendQueueMessage(CommandSender sender, String key, Game game);
+    void sendQueueMessage(CommandSender sender, String key, Game<?> game);
 }

@@ -5,10 +5,7 @@ import io.github.sylviameows.flask.api.game.Lobby;
 import io.github.sylviameows.flask.api.game.Phase;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class ExamplePlayingPhase implements Phase {
@@ -27,18 +24,20 @@ public class ExamplePlayingPhase implements Phase {
     }
 
     @Override
-    public void onEnabled(Lobby<?> parent) {
-        this.parent = parent;
+    public void onEnabled(Lobby<?> lobby) {
+        this.parent = lobby;
     }
 
     @Override
-    public void onDisabled() {
+    public void onDisabled() {}
 
-    }
     @Override
     public void onPlayerLeave(Player player) {
-        if (player == playerA) nextPhase.setWinner(playerB);
-        else nextPhase.setWinner(playerA);
+        if (player == playerA) {
+            nextPhase.setWinner(playerB);
+        } else {
+            nextPhase.setWinner(playerA);
+        }
         parent.nextPhase();
     }
 

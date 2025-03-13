@@ -13,6 +13,7 @@ public interface FlaskDispatcher extends EventExecutor, Listener {
     record ListenerInfo(Lobby<?> lobby, Method method, FlaskListener listener) {}
 
     void registerEvent(Lobby<?> lobby, FlaskListener listener);
+    
     void unregisterEvent(Lobby<?> lobby, FlaskListener listener);
 
     @Override

@@ -22,9 +22,11 @@ public class FlaskPlayerImpl implements FlaskPlayer {
     public void setGame(Game<? extends GameMap> game) {
         this.game = game;
     }
+
     public void setLobby(Lobby<?> lobby) {
         this.lobby = lobby;
     }
+
     public void setSession(EditorSession<? extends GameMap> session) {
         this.session = session;
     }
@@ -32,9 +34,11 @@ public class FlaskPlayerImpl implements FlaskPlayer {
     public Game<? extends GameMap> getGame() {
         return game;
     }
+
     public Lobby<?> getLobby() {
         return lobby;
     }
+
     public EditorSession<? extends GameMap> getSession() {
         return session;
     }
@@ -47,6 +51,7 @@ public class FlaskPlayerImpl implements FlaskPlayer {
     public boolean isOccupied() {
         return game != null || session != null;
     }
+
     public boolean isInQueue() {
         return game != null && lobby == null;
     }

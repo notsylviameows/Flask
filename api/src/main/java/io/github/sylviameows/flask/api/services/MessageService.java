@@ -26,6 +26,8 @@ public interface MessageService {
     }
 
     void sendMessage(CommandSender sender, MessageType type, String key);
+
     void sendMessage(CommandSender sender, MessageType type, String key, Object... params);
+
     void sendQueueMessage(CommandSender sender, String key, Game<?> game);
 }

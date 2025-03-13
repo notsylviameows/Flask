@@ -1,7 +1,5 @@
 package io.github.sylviameows.flask.api.annotations;
 
-import io.github.sylviameows.flask.api.map.FlaskMap;
-import io.github.sylviameows.flask.api.map.GameMap;
 import org.bukkit.Material;
 
 import java.lang.annotation.ElementType;

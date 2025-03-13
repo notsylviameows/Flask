@@ -2,6 +2,7 @@ package io.github.sylviameows.flask;
 
 import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.FlaskPlugin;
+import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.events.FlaskDispatcher;
 import io.github.sylviameows.flask.api.manager.PlayerManager;
 import io.github.sylviameows.flask.api.registry.GameRegistry;
@@ -42,7 +43,7 @@ import java.util.Random;
  * The main plugin file, where access to all necessary information is given.
  */
 public class Flask extends FlaskPlugin implements FlaskAPI {
-    public static ComponentLogger logger;
+    private static ComponentLogger logger;
     private static MessageServiceImpl messageService;
     private static WorldService worldService;
     private static Flask instance;
@@ -80,7 +81,6 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     public void onDisable() {
         purgeFlaskEntities();
     }
-
 
     public void registerCommands() {
         var lifecycle = this.getLifecycleManager();
@@ -174,15 +174,23 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     @Override
     public Location getSpawnLocation() {
         Location location = getConfig().getLocation("spawn_location");
-        if (location != null) return location;
+        if (location != null) {
+            return location;
+        }
 
         World world = Bukkit.getWorld("world");
-        if (world == null) world = Bukkit.getWorlds().getFirst();
+        if (world == null) {
+            world = Bukkit.getWorlds().getFirst();
+        }
         return world.getSpawnLocation();
     }
 
     @Override
     public FlaskAPI getFlaskAPI() {
         return this;
+    }
+
+    public static ComponentLogger logger() {
+        return logger;
     }
 }

@@ -14,31 +14,34 @@ import io.github.sylviameows.flask.api.util.WorldProperties;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class MapManager<T extends GameMap> implements Manager<T> {
-    WorldService ws = FlaskAPI.instance().getWorldService();
+    private final WorldService ws = FlaskAPI.instance().getWorldService();
 
-    protected final Map<String, T> map;
-    protected final String prefix;
+    private final Map<String, T> maps;
+    private final String prefix;
 
     public MapManager(Game<T> game, Class<T> clazz) {
-        this(game.getKey().namespace()+"/"+game.getKey().value()+"/", clazz);
+        this(game.getIdentifier().namespace()+"/"+game.getIdentifier().value()+"/", clazz);
     }
 
     protected MapManager(String prefix, Class<T> clazz) {
         this.prefix = prefix;
-        this.map = new HashMap<>();
+        this.maps = new HashMap<>();
     }
 
     private MapManager(String prefix, Map<String, T> map) {
         this.prefix = prefix;
-        this.map = map;
+        this.maps = map;
     }
 
     protected void initialize(Class<T> clazz) {
-//        clazz.getFields()
+        // clazz.getFields()
     }
 
     public CompletableFuture<SlimeWorld> getWorld(String id, boolean read_only) {
@@ -54,7 +57,9 @@ public class MapManager<T extends GameMap> implements Manager<T> {
                 throw new RuntimeException(e);
             } catch (UnknownWorldException e) {
                 ws.createWorldAsync(prefix+id).whenComplete((world, ex) -> {
-                    if (ex != null || world == null) promise.completeExceptionally(ex);
+                    if (ex != null || world == null) {
+                        promise.completeExceptionally(ex);
+                    }
                     promise.complete(world);
                 });
             }
@@ -81,11 +86,11 @@ public class MapManager<T extends GameMap> implements Manager<T> {
     }
 
     public T add(String key, T entry) {
-        return map.put(key, entry);
+        return maps.put(key, entry);
     }
 
     public T get(String key) {
-        return map.get(key);
+        return maps.get(key);
     }
 
     public T remove(T map) {
@@ -93,14 +98,22 @@ public class MapManager<T extends GameMap> implements Manager<T> {
     }
 
     public T remove(String key) {
-        return map.remove(key);
+        return maps.remove(key);
     }
 
     public Set<String> keys() {
-        return map.keySet();
+        return maps.keySet();
     }
 
     public Collection<T> values() {
-        return map.values();
+        return maps.values();
+    }
+
+    protected Map<String, T> getMaps() {
+        return this.maps;
+    }
+
+    protected String getPrefix() {
+        return this.prefix;
     }
 }

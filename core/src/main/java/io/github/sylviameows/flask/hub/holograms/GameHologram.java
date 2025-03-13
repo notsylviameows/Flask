@@ -7,8 +7,16 @@ import io.github.sylviameows.flask.hub.holograms.tasks.GameHologramManagerTask;
 import io.github.sylviameows.flask.managers.HologramManager;
 import io.github.sylviameows.flask.registries.GameRegistryImpl;
 import org.apache.commons.lang.NullArgumentException;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Interaction;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
@@ -22,7 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class GameHologram {
-    private final Game game;
+    private final Game<?> game;
     private final Location location;
 
     private final UUID uuid;
@@ -32,34 +40,8 @@ public class GameHologram {
 
     private final GameHologramManagerTask task;
 
-    public static void load() {
-        var logger = Flask.logger;
-        logger.info("Finding holograms...");
-        List<Interaction> selected = new ArrayList<>();
-
-        var worlds = Bukkit.getWorlds();
-        for (World world : worlds) {
-            var interactions = world.getEntitiesByClass(Interaction.class);
-            for (Interaction interaction : interactions) {
-                var data = interaction.getPersistentDataContainer().get(new NamespacedKey("flask", "special"), PersistentDataType.STRING);
-                if (Objects.equals(data, "hologram_interaction")) selected.add(interaction);
-            }
-        }
-        logger.info("Found "+selected.size()+" hologram(s) in "+worlds.size()+" world(s), starting initialization...");
-        int failures = 0;
-        for (Interaction interaction : selected) {
-            try {
-                new GameHologram(interaction);
-            } catch (Exception e) {
-                failures++;
-            }
-        }
-        if (failures > 0) logger.warn("Failed to initialize "+failures+" hologram(s)!");
-        logger.info("Initialized "+(selected.size()-failures)+" hologram(s) successfully.");
-    }
-
     public GameHologram(Game game, Location location) throws IllegalArgumentException {
-//        if (game.getKey() == null) throw new IllegalArgumentException("Provided game is not registered!");
+        // if (game.getKey() == null) throw new IllegalArgumentException("Provided game is not registered!");
         this.game = game;
         this.location = location.toCenterLocation().setDirection(new Vector(1,0,0));
 
@@ -84,7 +66,9 @@ public class GameHologram {
             this.display = disp;
 
             var gameKey = interaction.getPersistentDataContainer().get(new NamespacedKey("flask", "game"), PersistentDataType.STRING);
-            if (gameKey == null) throw new NullArgumentException("Game value on interaction entity is null!");
+            if (gameKey == null) {
+                throw new NullArgumentException("Game value on interaction entity is null!");
+            }
             this.game = GameRegistryImpl.instance().get(NamespacedKey.fromString(gameKey));
             this.location = display.getLocation();
 
@@ -104,11 +88,45 @@ public class GameHologram {
         }
     }
 
+    public static void load() {
+        var logger = Flask.logger();
+        logger.info("Finding holograms...");
+        List<Interaction> selected = new ArrayList<>();
+
+        var worlds = Bukkit.getWorlds();
+        for (World world : worlds) {
+            var interactions = world.getEntitiesByClass(Interaction.class);
+            for (Interaction interaction : interactions) {
+                var data = interaction.getPersistentDataContainer().get(new NamespacedKey("flask", "special"), PersistentDataType.STRING);
+                if (Objects.equals(data, "hologram_interaction")) {
+                    selected.add(interaction);
+                }
+            }
+        }
+        logger.info("Found "+selected.size()+" hologram(s) in "+worlds.size()+" world(s), starting initialization...");
+        int failures = 0;
+        for (Interaction interaction : selected) {
+            try {
+                new GameHologram(interaction);
+            } catch (IllegalArgumentException e) {
+                failures++;
+            }
+        }
+        if (failures > 0) {
+            logger.warn("Failed to initialize "+failures+" hologram(s)!");
+        }
+        logger.info("Initialized "+(selected.size()-failures)+" hologram(s) successfully.");
+    }
+
     private Entity findCompanion(Entity entity) {
         String uuidString = interaction.getPersistentDataContainer().get(new NamespacedKey("flask", "companion"), PersistentDataType.STRING);
-        if (uuidString == null) throw new NullArgumentException("Could not find companion data!");
+        if (uuidString == null) {
+            throw new NullArgumentException("Could not find companion data!");
+        }
         Entity companion = Bukkit.getEntity(UUID.fromString(uuidString));
-        if (companion == null) throw new NullArgumentException("Could not find companion entity!");
+        if (companion == null) {
+            throw new NullArgumentException("Could not find companion entity!");
+        }
         return companion;
     }
 
@@ -133,7 +151,7 @@ public class GameHologram {
     }
 
     private ItemDisplay spawnDisplay() {
-        Settings settings = game.getSettings();
+        Settings<?> settings = game.getSettings();
         Material icon = settings.getIcon();
 
         ItemDisplay entity = (ItemDisplay) location.getWorld().spawnEntity(location, EntityType.ITEM_DISPLAY);
@@ -172,7 +190,7 @@ public class GameHologram {
         // entity information
         var pdc = entity.getPersistentDataContainer();
         pdc.set(new NamespacedKey("flask","special"), PersistentDataType.STRING, "hologram_interaction");
-        pdc.set(new NamespacedKey("flask","game"), PersistentDataType.STRING, game.getKey().asString());
+        pdc.set(new NamespacedKey("flask","game"), PersistentDataType.STRING, game.getIdentifier().asString());
 
         return entity;
     }

@@ -4,10 +4,8 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.services.MessageService;
-import io.github.sylviameows.flask.services.MessageServiceImpl;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 
@@ -15,14 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class FlaskCommand {
-    protected final MessageService ms = FlaskAPI.instance().getMessageService();
+    protected static final MessageService ms = FlaskAPI.instance().getMessageService();
 
-    String label;
-    String[] aliases;
-    String permission;
+    private final String label;
+    private final String[] aliases;
+    private String permission;
 
-    protected List<FlaskCommand> subCommands = new ArrayList<>();
-    protected List<ArgumentBuilder<CommandSourceStack, ?>> arguments = new ArrayList<>();
+    private List<FlaskCommand> subCommands = new ArrayList<>();
+    private final List<ArgumentBuilder<CommandSourceStack, ?>> arguments = new ArrayList<>();
 
     protected FlaskCommand() {
         var annotation = this.getClass().getAnnotation(CommandProperties.class);
@@ -39,6 +37,10 @@ public abstract class FlaskCommand {
 
     public void addSubCommand(FlaskCommand command) {
         subCommands.add(command);
+    }
+
+    public void addArgument(ArgumentBuilder<CommandSourceStack, ?> argument) {
+        arguments.add(argument);
     }
 
     public LiteralArgumentBuilder<CommandSourceStack> preprocess(LiteralArgumentBuilder<CommandSourceStack> builder) {
@@ -62,7 +64,7 @@ public abstract class FlaskCommand {
             var chain = arguments.removeFirst();
             for (var argument : arguments) {
                 chain = chain.then(argument);
-            };
+            }
             command = command.then(chain);
         }
 
@@ -76,5 +78,25 @@ public abstract class FlaskCommand {
 
     public void register(Commands commands) {
         commands.register(build(), List.of(aliases));
+    }
+
+    public String label() {
+        return label;
+    }
+
+    public String[] aliases() {
+        return aliases;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
+
+    private List<ArgumentBuilder<CommandSourceStack, ?>> getArguments() {
+        return arguments;
     }
 }

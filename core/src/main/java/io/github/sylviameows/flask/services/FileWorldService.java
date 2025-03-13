@@ -15,7 +15,6 @@ import org.bukkit.Material;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class FileWorldService implements WorldService {
     private final SlimeLoader loader;

@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Lobby<G extends Game<?>> {
-    protected final G parent;
+    private final G parent;
 
-    public List<Player> players;
+    private List<Player> players;
     private @NotNull Phase phase;
 
     private World world;
@@ -31,7 +31,6 @@ public class Lobby<G extends Game<?>> {
         players.forEach(player -> api.getPlayerManager().get(player).setLobby(this));
 
         this.phase = parent.initialPhase();
-        api.getPlugin().getLogger().info("registering");
         api.getDispatcher().registerEvent(this, this.phase);
         this.phase.onEnabled(this);
     }
@@ -52,45 +51,56 @@ public class Lobby<G extends Game<?>> {
     }
 
     public void closeLobby() {
-        phase.onDisabled();
-
-        FlaskAPI.instance().getPlugin().getLogger().info("unregistering");
-        FlaskAPI.instance().getDispatcher().unregisterEvent(this, phase);
-
-        // todo: replace with a requeue feature?
-        players.forEach(player -> {
-            parent.getQueue().removePlayer(player);
-            player.teleportAsync(FlaskAPI.instance().getSpawnLocation());
-            player.setGameMode(GameMode.ADVENTURE);
-            player.setHealth(20.0);
-            player.setSaturation(10f);
-            player.setFoodLevel(20);
-        });
-
-        Bukkit.getScheduler().runTaskLater(FlaskAPI.instance().getPlugin(), () -> {
-            Bukkit.unloadWorld(world, false);
-        }, 200L);
+        closeLobby(null);
     }
 
     public void closeLobby(Consumer<Player> consumer) {
         players.forEach(consumer);
         closeLobby();
-    }
 
+        phase.onDisabled();
 
-    public Phase getPhase() {
-        return phase;
-    }
-    public void updatePhase(@NotNull Phase phase) {
-        this.phase.onDisabled();
-        FlaskAPI.instance().getPlugin().getLogger().info("unregistering");
         FlaskAPI.instance().getDispatcher().unregisterEvent(this, phase);
 
+        players.forEach(player -> {
+            resetPlayer(player);
+            consumer.accept(player);
+        });
+
+        Bukkit.getScheduler().runTaskLater(FlaskAPI.instance().getPlugin(), () -> {
+            Bukkit.unloadWorld(world, false);
+        }, 200L /* 10 SECONDS */);
+    }
+
+    // todo: add a requeue feature?
+    public void resetPlayer(Player player) {
+        parent.getQueue().removePlayer(player);
+        player.teleportAsync(FlaskAPI.instance().getSpawnLocation());
+        player.setGameMode(GameMode.ADVENTURE);
+
+        player.heal(Integer.MAX_VALUE);
+        player.setSaturation(10f);
+        player.setFoodLevel(20);
+    }
+
+    public void setPhase(@NotNull Phase phase) {
         this.phase = phase;
+    }
+
+    public @NotNull Phase getPhase() {
+        return phase;
+    }
+
+    public void updatePhase(@NotNull Phase newPhase) {
+        this.phase.onDisabled();
+        FlaskAPI.instance().getPlugin().getLogger().info("unregistering");
+        FlaskAPI.instance().getDispatcher().unregisterEvent(this, newPhase);
+
+        this.phase = newPhase;
 
         this.phase.onEnabled(this);
         FlaskAPI.instance().getPlugin().getLogger().info("registering");
-        FlaskAPI.instance().getDispatcher().registerEvent(this, phase);
+        FlaskAPI.instance().getDispatcher().registerEvent(this, newPhase);
     }
 
     public void nextPhase() {
@@ -104,6 +114,14 @@ public class Lobby<G extends Game<?>> {
 
     public G getParent() {
         return parent;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 
     public World getWorld() {

@@ -10,7 +10,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventException;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.player.PlayerEvent;
@@ -21,10 +25,14 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class FlaskDispatcherImpl implements FlaskDispatcher {
-    Map<Class<? extends Event>, ArrayList<ListenerInfo>> methodMap = new HashMap<>();
+    private final Map<Class<? extends Event>, ArrayList<ListenerInfo>> methodMap = new HashMap<>();
 
     @Override
     public void registerEvent(Lobby<?> lobby, FlaskListener listener) {
@@ -59,8 +67,10 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
     @Override
     public void unregisterEvent(Lobby<?> lobby, FlaskListener listener) {
         methodMap.forEach((clazz, listeners) -> {
-            Optional<ListenerInfo> optional = listeners.stream().filter(info -> (info.listener() == listener && info.lobby() == lobby)).findFirst();
-            if (optional.isEmpty()) return;
+            Optional<ListenerInfo> optional = listeners.stream().filter(info -> info.listener() == listener && info.lobby() == lobby).findFirst();
+            if (optional.isEmpty()) {
+                return;
+            }
             ListenerInfo info = optional.get();
 
             listeners.remove(info);
@@ -77,7 +87,7 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
                     handlerList.unregister(this);
                 }
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                Flask.logger.warn("Could not unregister listener for event type "+clazz.getName());
+                Flask.logger().warn("Could not unregister listener for event type "+clazz.getName());
             }
         });
     }
@@ -87,8 +97,14 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
         List<ListenerInfo> listeners = new ArrayList<>();
 
         Class<? extends Event> clazz = event.getClass();
-        methodMap.forEach((e, i) -> {if (e.isAssignableFrom(clazz)) listeners.addAll(i);});
-        if (listeners.isEmpty()) return;
+        methodMap.forEach((e, i) -> {
+            if (e.isAssignableFrom(clazz)) {
+                listeners.addAll(i);
+            }
+        });
+        if (listeners.isEmpty()) {
+            return;
+        }
 
         ListenerInfo info = null;
         switch (event) {
@@ -122,7 +138,9 @@ public class FlaskDispatcherImpl implements FlaskDispatcher {
             }
         }
 
-        if (info == null) return;
+        if (info == null) {
+            return;
+        }
 
         try {
             info.method().invoke(info.listener(), event);

@@ -3,7 +3,6 @@ package io.github.sylviameows.flask.editor.book.components.variable;
 import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.annotations.MapProperty;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.book.components.BookComponent;
 import net.kyori.adventure.text.Component;
@@ -17,17 +16,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 abstract public class BookOption implements BookComponent {
-    /**
-     * The amount of lines this variable takes in the book.
-     */
-    public abstract int lines();
+    private final String title;
+    private final String description;
+    private final boolean required;
 
-    final String title;
-    final String description;
-    final boolean required;
-
-    final Field field;
-    final GameMap map;
+    private final Field field;
+    private final GameMap map;
 
     protected BookOption(Field field, GameMap map) {
         this.field = field;
@@ -49,14 +43,23 @@ abstract public class BookOption implements BookComponent {
 
     }
 
+    /**
+     * The amount of lines this variable takes in the book.
+     */
+    public abstract int lines();
+
     protected Component header() {
         var component = Component.empty();
 
         var name = Component.text(title).style(Style.style(Palette.BLACK, TextDecoration.BOLD));
-        if (!description.isEmpty()) name = name.hoverEvent(HoverEvent.showText(Component.text(description)));
+        if (!description.isEmpty()) {
+            name = name.hoverEvent(HoverEvent.showText(Component.text(description)));
+        }
 
         component = component.append(name);
-        if (!isOptional()) component = component.append(Component.text("*").hoverEvent(HoverEvent.showText(Component.text("Required"))));
+        if (!isOptional()) {
+            component = component.append(Component.text("*").hoverEvent(HoverEvent.showText(Component.text("Required"))));
+        }
 
         return component;
     }
@@ -80,7 +83,7 @@ abstract public class BookOption implements BookComponent {
             field.setAccessible(true);
             return field.get(instance);
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            Flask.logger.error(e.getClass().getName());
+            Flask.logger().error(e.getClass().getName());
             return null;
         }
     }
@@ -88,5 +91,25 @@ abstract public class BookOption implements BookComponent {
     @Override
     public Component label() {
         return header().appendNewline().append(value()).appendNewline().append(buttons()).appendNewline();
+    }
+
+    protected String title() {
+        return title;
+    }
+
+    protected String description() {
+        return description;
+    }
+
+    protected boolean required() {
+        return required;
+    }
+
+    protected Field field() {
+        return field;
+    }
+
+    protected GameMap map() {
+        return map;
     }
 }

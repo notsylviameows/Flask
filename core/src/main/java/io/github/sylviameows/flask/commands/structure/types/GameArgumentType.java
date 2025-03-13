@@ -13,7 +13,6 @@ import io.github.sylviameows.flask.api.game.Game;
 import io.github.sylviameows.flask.registries.GameRegistryImpl;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,9 +29,8 @@ public class GameArgumentType implements CustomArgumentType<Game, NamespacedKey>
         return new GameArgumentType();
     }
 
-
     @Override
-    public @NotNull Game parse(@NotNull StringReader reader) throws CommandSyntaxException {
+    public @NotNull Game<?> parse(@NotNull StringReader reader) throws CommandSyntaxException {
         final int start = reader.getCursor();
 
         while (reader.canRead() && (StringReader.isAllowedInUnquotedString(reader.peek()) || reader.peek() == ':')) {
@@ -40,7 +38,7 @@ public class GameArgumentType implements CustomArgumentType<Game, NamespacedKey>
         }
         String result = reader.getString().substring(start, reader.getCursor());
 
-        Game game;
+        Game<?> game;
         if (result.contains(":")) {
             NamespacedKey key = NamespacedKey.fromString(result);
             game = registry.get(key);
@@ -52,8 +50,6 @@ public class GameArgumentType implements CustomArgumentType<Game, NamespacedKey>
             var message = new LiteralMessage("Invalid game argument.");
             throw new SimpleCommandExceptionType(message).createWithContext(reader);
         }
-
-//        ServerGamePacketListenerImpl
 
         return game;
     }
@@ -92,7 +88,9 @@ public class GameArgumentType implements CustomArgumentType<Game, NamespacedKey>
                 }
             } else {
                 String string = key.asString();
-                if (string.startsWith(input)) builder.suggest(string, message);
+                if (string.startsWith(input)) {
+                    builder.suggest(string, message);
+                }
             }
         }
 

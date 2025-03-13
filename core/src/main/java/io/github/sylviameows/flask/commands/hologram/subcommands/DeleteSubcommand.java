@@ -68,9 +68,9 @@ public class DeleteSubcommand extends FlaskCommand {
                 double eZ = location.z();
                 // (bx-.75 <= ex && ex <= bx+1.75) && (bz-.75 <= ez && ez <= bz+1.75) && (by-1 <= ey && ey <= by+2.5)
                 if (
-                    (bX-0.75 <= eX && eX <= bX+1.75) &&
-                    (bZ-0.75 <= eZ && eZ <= bZ+1.75) &&
-                    (bY-1.00 <= eY && eY <= bY+2.50)
+                    bX-0.75 <= eX && eX <= bX+1.75 &&
+                    bZ-0.75 <= eZ && eZ <= bZ+1.75 &&
+                    bY-1.00 <= eY && eY <= bY+2.50
                 ) {
                     target = entity;
                     break;

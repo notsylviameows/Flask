@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 abstract class RegistryImpl<T> implements Registry<T> {
-    protected final Map<NamespacedKey, T> map;
+    private final Map<NamespacedKey, T> map;
 
     protected RegistryImpl() {
         this.map = new ConcurrentHashMap<>();
@@ -17,6 +17,7 @@ abstract class RegistryImpl<T> implements Registry<T> {
     public T add(NamespacedKey key, T entry) {
         return map.put(key, entry);
     }
+
     public T add(Plugin plugin, String key, T entry) {
         return add(new NamespacedKey(plugin, key), entry);
     }
@@ -24,6 +25,7 @@ abstract class RegistryImpl<T> implements Registry<T> {
     public T get(NamespacedKey key) {
         return map.get(key);
     }
+
     public T get(Plugin plugin, String key) {
         return get(new NamespacedKey(plugin, key));
     }
@@ -31,7 +33,12 @@ abstract class RegistryImpl<T> implements Registry<T> {
     public T remove(NamespacedKey key) {
         return map.remove(key);
     }
+
     public T remove(Plugin plugin, String key) {
         return remove(new NamespacedKey(plugin, key));
+    }
+
+    protected Map<NamespacedKey, T> map() {
+        return map;
     }
 }

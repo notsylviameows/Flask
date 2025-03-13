@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.FlaskPlayer;
 import io.github.sylviameows.flask.api.game.Game;
-import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.api.services.MessageService;
 import io.github.sylviameows.flask.commands.structure.CommandProperties;
 import io.github.sylviameows.flask.commands.structure.FlaskCommand;
@@ -20,7 +19,7 @@ import org.bukkit.entity.Player;
 @CommandProperties(label = "open", aliases = {"create", "start"})
 public class OpenSession extends FlaskCommand {
     public OpenSession() {
-        arguments.add(Commands.argument("game", GameArgumentType.game()).executes(context -> {
+        addArgument(Commands.argument("game", GameArgumentType.game()).executes(context -> {
             Game<?> game = context.getArgument("game", Game.class);
             return executeWithArgs(context, game);
         }).then(Commands.argument("map", StringArgumentType.word()).suggests((context,builder) -> {
@@ -30,17 +29,14 @@ public class OpenSession extends FlaskCommand {
         }).executes(context -> {
             Game<?> game = context.getArgument("game", Game.class);
             String mapId = context.getArgument("map", String.class);
-//            var map = game.getMapManager().get(mapId); //fixme later (re-add when creating maps is separated from sessions)
-//            if (map == null) {
-//                return 0; //TODO: prompt to create map or just error?
-//            }
+            // var map = game.getMapManager().get(mapId); //fixme later (re-add when creating maps is separated from sessions)
+            // if (map == null) {
+            //     return 0; //TODO: prompt to create map or just error?
+            // }
 
             return executeWithArgs(context, game, mapId);
         })));
     }
-
-
-
 
     @Override
     public int execute(CommandContext<CommandSourceStack> context) {

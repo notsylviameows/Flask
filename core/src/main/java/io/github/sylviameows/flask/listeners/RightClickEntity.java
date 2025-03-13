@@ -31,7 +31,9 @@ public class RightClickEntity implements Listener {
             if (!Objects.equals(
                     pdc.get(new NamespacedKey("flask", "special"), PersistentDataType.STRING),
                     "hologram_interaction")
-            ) return;
+            ) {
+                return;
+            }
 
             var ms = FlaskAPI.instance().getMessageService();
 
@@ -42,7 +44,9 @@ public class RightClickEntity implements Listener {
             }
 
             String gameKeyString = pdc.get(new NamespacedKey("flask", "game"), PersistentDataType.STRING);
-            if (gameKeyString == null) return;
+            if (gameKeyString == null) {
+                return;
+            }
             Game game = GameRegistryImpl.instance().get(NamespacedKey.fromString(gameKeyString));
             if (game == null) {
                 ms.sendMessage(player, MessageServiceImpl.MessageType.ERROR, "game_doesnt_exist", gameKeyString);

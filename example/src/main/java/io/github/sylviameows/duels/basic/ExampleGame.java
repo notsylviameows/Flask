@@ -38,7 +38,9 @@ public class ExampleGame extends Game<ExampleMap> {
 
     @Override
     public MapManager<ExampleMap> getMapManager() {
-        if (mm == null) mm = new MapManager<>(this, ExampleMap.class);
+        if (mm == null) {
+            mm = new MapManager<>(this, ExampleMap.class);
+        }
         return mm;
     }
 }

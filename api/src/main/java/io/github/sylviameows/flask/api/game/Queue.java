@@ -94,20 +94,24 @@ public class Queue<G extends Game<?>> {
             });
             player.hideBossBar(bar);
             updateBar();
-            if (task != null) task.remove(player);
+
+            if (task != null) {
+                task.remove(player);
+            }
+
             totalPlayers--;
         }
     }
 
     /**
      * Fills a {@link QueueTask} with players from the queue until it is full, or the queue runs out of players.
-     * @param task the {@link QueueTask} to fill.
+     * @param targetTask the {@link QueueTask} to fill.
      */
-    public void fill(@NotNull QueueTask task) {
+    public void fill(@NotNull QueueTask targetTask) {
         Integer maximum = parent.getSettings().getMaxPlayers();
 
-        while (task.size() < maximum && !queue.isEmpty()) {
-            task.add(queue.removeFirst());
+        while (targetTask.size() < maximum && !queue.isEmpty()) {
+            targetTask.add(queue.removeFirst());
         }
     }
 

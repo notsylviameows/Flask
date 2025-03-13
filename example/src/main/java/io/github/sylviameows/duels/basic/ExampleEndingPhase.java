@@ -27,14 +27,14 @@ public class ExampleEndingPhase implements Phase {
     }
 
     @Override
-    public void onEnabled(Lobby<?> parent) {
-        this.parent = parent;
+    public void onEnabled(Lobby<?> lobby) {
+        this.parent = lobby;
 
-        parent.players.forEach(this::ending);
+        lobby.getPlayers().forEach(this::ending);
 
         // close lobby after 5.
-        Bukkit.getScheduler().runTaskLater(parent.getParent().getPlugin(), () -> {
-            parent.closeLobby(player -> {
+        Bukkit.getScheduler().runTaskLater(lobby.getParent().getPlugin(), () -> {
+            lobby.closeLobby(player -> {
                 player.setGameMode(GameMode.ADVENTURE);
             });
         }, 100L);
@@ -73,14 +73,14 @@ public class ExampleEndingPhase implements Phase {
 
     @Override
     public void onDisabled() {
-        parent.players.forEach(player -> {
+        this.parent.getPlayers().forEach(player -> {
             player.setGameMode(GameMode.ADVENTURE);
 
             var lobby = Bukkit.getWorld("world");
             player.teleport(new Location(lobby, 0.0, -60.0, 0.0));
         });
 
-        var world = parent.getWorld();
+        var world = this.parent.getWorld();
         if (world != null) {
             Bukkit.unloadWorld(world.getName(), false);
         }

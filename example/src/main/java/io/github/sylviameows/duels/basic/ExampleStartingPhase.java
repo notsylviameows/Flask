@@ -4,7 +4,11 @@ import com.infernalsuite.aswm.api.world.SlimeWorld;
 import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.game.Lobby;
 import io.github.sylviameows.flask.api.game.Phase;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -19,8 +23,8 @@ public class ExampleStartingPhase implements Phase {
 
     @Override
     public void onEnabled(Lobby<?> parent) {
-        playerA = parent.players.getFirst();
-        playerB = parent.players.getLast();
+        playerA = parent.getPlayers().getFirst();
+        playerB = parent.getPlayers().getLast();
 
         setupPlayer(playerA, Color.RED);
         setupPlayer(playerB, Color.AQUA);

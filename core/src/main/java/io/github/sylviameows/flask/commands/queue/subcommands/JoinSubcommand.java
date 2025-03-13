@@ -14,9 +14,7 @@ import org.bukkit.entity.Player;
 @CommandProperties(label = "join", permission = "flask.queue.join")
 public class JoinSubcommand extends FlaskCommand {
     public JoinSubcommand() {
-        super();
-
-        arguments.add(Commands.argument("game", GameArgumentType.game()).executes(context -> {
+        addArgument(Commands.argument("game", GameArgumentType.game()).executes(context -> {
             Game game = context.getArgument("game", Game.class);
             return executeWithArgs(context, game);
         }));

@@ -3,7 +3,7 @@ package io.github.sylviameows.flask.editor.book.components;
 import net.kyori.adventure.text.Component;
 
 public class BookLabel implements BookComponent {
-    private Component label;
+    private final Component label;
 
     public BookLabel(Component label) {
         this.label = label;

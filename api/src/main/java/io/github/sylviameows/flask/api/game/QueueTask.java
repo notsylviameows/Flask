@@ -5,7 +5,6 @@ import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.services.MessageService;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Color;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 

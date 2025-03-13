@@ -14,9 +14,7 @@ import org.bukkit.entity.Player;
 @CommandProperties(label = "create", permission = "flask.hologram.create")
 public class CreateSubcommand extends FlaskCommand {
     public CreateSubcommand() {
-        super();
-
-        arguments.add(Commands.argument("game", GameArgumentType.game()).executes(context -> {
+        addArgument(Commands.argument("game", GameArgumentType.game()).executes(context -> {
             Game game = context.getArgument("game", Game.class);
             return executeWithArgs(context, game);
         }));

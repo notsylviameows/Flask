@@ -12,8 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/download-artifact@4
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4.1.9
         with:
           name: flask
-      - name: display structure
+      - name: Display Files
         run: ls -R

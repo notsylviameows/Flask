@@ -28,7 +28,7 @@ jobs:
       run: ./gradlew build
     - name : Retrieve Version
       run: |
-       echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
+       echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q version)"
       id: version
     - name: Store Version
       run: |

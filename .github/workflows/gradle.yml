@@ -42,9 +42,10 @@ jobs:
     needs: build
     env:
       version: ${{ needs.build.outputs.version }}
+      latest: ${{ vars.LATEST_VERSION }}
     steps:
     - name: Get Version
-      run: 'echo version : ${{ env.version }} : $LATEST_VERSION'
+      run: 'echo version : ${{ env.version }} : ${{ env.latest }}'
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:

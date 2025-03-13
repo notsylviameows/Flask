@@ -39,6 +39,7 @@ jobs:
     
   release:
     runs-on: ubuntu-latest
+    environment: publish
     needs: build
     env:
       version: ${{ needs.build.outputs.version }}

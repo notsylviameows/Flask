@@ -1,5 +1,8 @@
 name: Build
 
+env:
+  VERSION_NAME: 'test'
+
 on:
   push:
     branches: [ "main" ]

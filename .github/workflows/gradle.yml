@@ -33,8 +33,11 @@ jobs:
       with:
         name: Flask
         path: ./*/build/libs/flask-*.jar
-    - uses: thecodemonkey/action-get-gradle-version@master
-      id: version
+    - run: 'ls -R'
+    # - uses: thecodemonkey/action-get-gradle-version@master
+    #   id: version
+    #   with:
+    #     file: 
     - run: 'echo version ${{ steps.version.outputs.version }}'
     
   release:

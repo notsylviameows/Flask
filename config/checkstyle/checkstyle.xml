@@ -8,18 +8,19 @@
         <property name="eachLine" value="true"/>
     </module>
     <module name="NewlineAtEndOfFile"/>
-    <module name="RegexpMultiline">
-        <property name="format" value="^([^\n ]+ )*(class|interface|enum) [^{]*\{\n[^\n}]"/>
-        <property name="message" value="Leave empty row after class/interface/enum definition!"/>
-        <property name="severity" value="error"/>
-        <property name="fileExtensions" value="groovy,java"/>
-    </module>
-    <module name="RegexpMultiline">
-        <property name="format" value="[^\n{]\n\}\n"/>
-        <property name="message" value="Leave empty row before end of class/interface/enum!"/>
-        <property name="severity" value="error"/>
-        <property name="fileExtensions" value="groovy,java"/>
-    </module>
+<!--    remove rule that isn't working in my ide-->
+<!--    <module name="RegexpMultiline">-->
+<!--        <property name="format" value="^([^\n ]+ )*(class|interface|enum) [^{]*\{\n[^\n}]"/>-->
+<!--        <property name="message" value="Leave empty row after class/interface/enum definition!"/>-->
+<!--        <property name="severity" value="error"/>-->
+<!--        <property name="fileExtensions" value="groovy,java"/>-->
+<!--    </module>-->
+<!--    <module name="RegexpMultiline">-->
+<!--        <property name="format" value="[^\n{]\n\}\n"/>-->
+<!--        <property name="message" value="Leave empty row before end of class/interface/enum!"/>-->
+<!--        <property name="severity" value="error"/>-->
+<!--        <property name="fileExtensions" value="groovy,java"/>-->
+<!--    </module>-->
 
     <!-- Code File Rules -->
     <module name="TreeWalker">

@@ -45,10 +45,19 @@ jobs:
       version: ${{ needs.build.outputs.version }}
       latest: ${{ vars.LATEST_VERSION }}
     steps:
-    - name: Get Version
-      run: 'echo version : ${{ env.version }} : ${{ env.latest }}'
     - name: Download Artifact
-      if: env.version != env.latest
       uses: actions/download-artifact@v4
       with:
         name: Flask
+    - name: Publish Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: ${{ env.version != env.latest }}
+        title: ${{ env.version }}
+        files: |
+          *.jar
+    - name: Update Version
+      if: env.version != env.latest
+      run: echo "LATEST_VERSION=${{ env.version }}" >> $GITHUB_ENV

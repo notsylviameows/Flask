@@ -41,12 +41,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     needs: build
-    if: needs.build.outputs.version != vars.LATEST_VERSION
     env:
       version: ${{ needs.build.outputs.version }}
+      latest: ${{ vars.LATEST_VERSION }}
     steps:
     - name: Get Version
-      run: 'echo version : ${{ env.version }} : ${{ vars.LATEST_VERSION }}'
+      run: 'echo version : ${{ env.version }} : ${{ env.latest }}'
     - name: Download Artifact
       if: env.version != env.latest
       uses: actions/download-artifact@v4

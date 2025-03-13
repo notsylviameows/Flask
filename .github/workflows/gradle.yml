@@ -26,13 +26,8 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
     - name: Build with Gradle
       run: ./gradlew build
-    - name : Retrieve Version
-      run: |
-       echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q version)"
-      id: version
-    - name: Store Version
-      run: |
-        echo "version_name=${{steps.version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
+    - name: Expose Version
+      run: echo "VERSION_NAME=$( ./gradlew -q app:version )" >> $GITHUB_ENV
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:

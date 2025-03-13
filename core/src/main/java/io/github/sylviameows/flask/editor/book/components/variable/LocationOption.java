@@ -1,7 +1,6 @@
 package io.github.sylviameows.flask.editor.book.components.variable;
 
 import io.github.sylviameows.flask.api.Palette;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.book.components.button.BookButton;
 import io.github.sylviameows.flask.editor.book.components.button.ButtonStyle;
@@ -25,8 +24,8 @@ public class LocationOption extends BookOption {
     @Override
     protected Component value() {
         try {
-            field.setAccessible(true);
-            var value = field.get(map);
+            field().setAccessible(true);
+            var value = field().get(map());
 
             if (value instanceof Location location) {
                 var string = String.format("%s, %s, %s", round(location.x()), round(location.y()), round(location.z()));
@@ -47,24 +46,34 @@ public class LocationOption extends BookOption {
     protected Component buttons() {
         var set = BookButton.callback("set", "Click to set to your current location.", ButtonStyle.CONSTRUCTIVE, audience -> {
             var filtered = audience.get(Identity.UUID);
+            if (filtered.isEmpty()) {
+                return;
+            }
             var player = Bukkit.getPlayer(filtered.get());
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
 
             try {
-                field.setAccessible(true);
-                field.set(map, player.getLocation());
+                field().setAccessible(true);
+                field().set(map(), player.getLocation());
             } catch (IllegalAccessException ignored) {
             }
         });
 
         var teleport = BookButton.callback("teleport", "Click to teleport to set location.", ButtonStyle.MODIFYING, audience -> {
             var filtered = audience.get(Identity.UUID);
+            if (filtered.isEmpty()) {
+                return;
+            }
             var player = Bukkit.getPlayer(filtered.get());
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
 
             try {
-                field.setAccessible(true);
-                player.teleport((Location) field.get(map));
+                field().setAccessible(true);
+                player.teleport((Location) field().get(map()));
             } catch (IllegalAccessException ignored) {
 
             }
@@ -72,16 +81,16 @@ public class LocationOption extends BookOption {
 
         var unset = BookButton.callback("x", "Click to unset the location.", ButtonStyle.DESTRUCTIVE, audience -> {
             try {
-                field.setAccessible(true);
-                field.set(map, null);
+                field().setAccessible(true);
+                field().set(map(), null);
             } catch (IllegalAccessException ignored) {
 
             }
         });
 
         try {
-            field.setAccessible(true);
-            if (field.canAccess(map) && field.get(map) == null) {
+            field().setAccessible(true);
+            if (field().canAccess(map()) && field().get(map()) == null) {
                 teleport.disable();
                 unset.disable();
             }

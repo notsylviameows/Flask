@@ -5,7 +5,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.CountDownLatch;
 
-public class SchedulerUtil {
+public final class SchedulerUtil {
+    private SchedulerUtil() {}
 
     // this method is to ensure code runs synchronously safely.
     public static void runSyncAndWait(Plugin plugin, Runnable runnable) {

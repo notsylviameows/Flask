@@ -18,7 +18,7 @@ import java.util.List;
  * available and meets the requirements in the game's {@link Settings}.
  * @param <G> the {@link Game} type this queue is meant for.
  */
-public class Queue<G extends Game> {
+public class Queue<G extends Game<?>> {
     private final G parent;
 
     private Integer totalPlayers;
@@ -28,7 +28,7 @@ public class Queue<G extends Game> {
 
     private final PlayerManager pm;
 
-    private BossBar bar;
+    private final BossBar bar;
 
     public Queue(G game) {
         this.parent = game;
@@ -94,20 +94,24 @@ public class Queue<G extends Game> {
             });
             player.hideBossBar(bar);
             updateBar();
-            if (task != null) task.remove(player);
+
+            if (task != null) {
+                task.remove(player);
+            }
+
             totalPlayers--;
         }
     }
 
     /**
      * Fills a {@link QueueTask} with players from the queue until it is full, or the queue runs out of players.
-     * @param task the {@link QueueTask} to fill.
+     * @param targetTask the {@link QueueTask} to fill.
      */
-    public void fill(@NotNull QueueTask task) {
+    public void fill(@NotNull QueueTask targetTask) {
         Integer maximum = parent.getSettings().getMaxPlayers();
 
-        while (task.size() < maximum && !queue.isEmpty()) {
-            task.add(queue.removeFirst());
+        while (targetTask.size() < maximum && !queue.isEmpty()) {
+            targetTask.add(queue.removeFirst());
         }
     }
 

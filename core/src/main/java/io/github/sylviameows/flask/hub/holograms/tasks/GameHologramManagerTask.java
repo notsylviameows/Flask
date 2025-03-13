@@ -10,7 +10,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
@@ -33,7 +37,7 @@ public final class GameHologramManagerTask extends BukkitRunnable {
         this.game = game;
         this.display = display;
 
-        this.key = game.getKey();
+        this.key = game.getIdentifier();
     }
 
     /**
@@ -56,7 +60,9 @@ public final class GameHologramManagerTask extends BukkitRunnable {
             // possibly make this stop trying after a while?
             loops++;
 
-            if (loops >= 20) loops = 0;
+            if (loops >= 20) {
+                loops = 0;
+            }
             if (loops == 0) {
                 this.game = GameRegistryImpl.instance().get(key);
             }
@@ -65,18 +71,24 @@ public final class GameHologramManagerTask extends BukkitRunnable {
         // spin item display
         Location location = display.getLocation();
         var yaw = location.getYaw() + 2;
-        if (yaw >= 180) yaw = yaw - 360;
+        if (yaw >= 180) {
+            yaw = yaw - 360;
+        }
 
         location.setYaw(yaw);
         display.teleport(location);
 
         // get nearby players
         var players = location.getNearbyPlayers(2.8);
-        if (players.isEmpty() && holograms.isEmpty()) return;
+        if (players.isEmpty() && holograms.isEmpty()) {
+            return;
+        }
 
         // add new players without holograms
         for (Player player : players) {
-            if (holograms.containsKey(player.getName())) continue;
+            if (holograms.containsKey(player.getName())) {
+                continue;
+            }
 
             TextDisplay hologram = spawnText();
             hologram.setVisibleByDefault(false);
@@ -91,7 +103,9 @@ public final class GameHologramManagerTask extends BukkitRunnable {
         var nearbyPlayers = players.stream().map(Player::getName).toList();
         var hologramViewers = holograms.keySet().stream().toList(); // fix concurrency error hopefully
         for (String name : hologramViewers) {
-            if (nearbyPlayers.contains(name)) continue;
+            if (nearbyPlayers.contains(name)) {
+                continue;
+            }
 
             TextDisplay hologram = holograms.get(name);
             new GameHologramHideTask(hologram, 15, Flask.getInstance()).runTask(Flask.getInstance());

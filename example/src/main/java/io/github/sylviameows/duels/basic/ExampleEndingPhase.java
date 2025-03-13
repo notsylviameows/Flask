@@ -1,8 +1,9 @@
 package io.github.sylviameows.duels.basic;
 
 import io.github.sylviameows.flask.api.Palette;
-import io.github.sylviameows.flask.api.game.Lobby;
-import io.github.sylviameows.flask.api.game.Phase;
+import io.github.sylviameows.flask.api.annotations.FlaskEvent;
+import io.github.sylviameows.flask.api.game.phase.ListenerPhase;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -12,29 +13,24 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.time.Duration;
 
-public class ExampleEndingPhase implements Phase {
+public class ExampleEndingPhase extends ListenerPhase {
     private Player winner;
-
-    private Lobby<?> parent;
 
     public void setWinner(Player player) {
         this.winner = player;
     }
 
     @Override
-    public void onEnabled(Lobby<?> parent) {
-        this.parent = parent;
-
-        parent.players.forEach(this::ending);
+    public void enabled() {
+        getLobby().getPlayers().forEach(this::ending);
 
         // close lobby after 5.
-        Bukkit.getScheduler().runTaskLater(parent.getParent().getPlugin(), () -> {
-            parent.closeLobby(player -> {
+        Bukkit.getScheduler().runTaskLater(getLobby().getParent().getPlugin(), () -> {
+            getLobby().closeLobby(player -> {
                 player.setGameMode(GameMode.ADVENTURE);
             });
         }, 100L);
@@ -43,7 +39,7 @@ public class ExampleEndingPhase implements Phase {
     private void ending(Player player) {
         player.getInventory().clear();
 
-        Component prefix = Component.text("SYSTEM › ").color(parent.getParent().getSettings().getColor());
+        Component prefix = Component.text("SYSTEM › ").color(getLobby().getParent().getSettings().getColor());
         player.sendMessage(prefix
                 .append(Component.text(winner.getName()).color(Palette.WHITE))
                 .append(Component.text(" won the duel!").color(Palette.GRAY))
@@ -72,26 +68,24 @@ public class ExampleEndingPhase implements Phase {
     }
 
     @Override
-    public void onDisabled() {
-        parent.players.forEach(player -> {
+    protected void disabled() {
+        this.getLobby().getPlayers().forEach(player -> {
             player.setGameMode(GameMode.ADVENTURE);
 
             var lobby = Bukkit.getWorld("world");
             player.teleport(new Location(lobby, 0.0, -60.0, 0.0));
         });
 
-        var world = parent.getWorld();
+        var world = getLobby().getWorld();
         if (world != null) {
             Bukkit.unloadWorld(world.getName(), false);
         }
     }
 
-    @EventHandler
-    private void damage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (parent.players.contains(player)) {
-                event.setCancelled(true);
-            }
+    @FlaskEvent
+    public void damage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            event.setCancelled(true);
         }
     }
 

@@ -10,9 +10,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 @CommandProperties(label = "hologram", aliases = {"holo"}, permission = "flask.hologram")
 public class HologramCommand extends FlaskCommand {
     public HologramCommand() {
-        super();
-        subCommands.add(new CreateSubcommand());
-        subCommands.add(new DeleteSubcommand());
+        addSubCommand(new CreateSubcommand());
+        addSubCommand(new DeleteSubcommand());
     }
 
     @Override

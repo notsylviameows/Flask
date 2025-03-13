@@ -8,7 +8,10 @@ import org.bukkit.entity.Player;
  */
 public interface PlayerManager extends Manager<FlaskPlayer> {
     FlaskPlayer add(Player player);
+
     boolean has(Player player);
+
     FlaskPlayer get(Player player);
+
     FlaskPlayer remove(Player player);
 }

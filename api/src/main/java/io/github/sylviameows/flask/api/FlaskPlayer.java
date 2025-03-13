@@ -6,13 +6,16 @@ import io.github.sylviameows.flask.api.map.GameMap;
 
 public interface FlaskPlayer {
     void setGame(Game<? extends GameMap> game);
+
     void setLobby(Lobby<?> lobby);
 
     Game<? extends GameMap> getGame();
+
     Lobby<?> getLobby();
 
     void reset();
 
     boolean isOccupied();
+
     boolean isInQueue();
 }

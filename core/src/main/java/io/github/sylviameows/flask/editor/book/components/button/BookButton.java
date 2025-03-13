@@ -12,14 +12,14 @@ public class BookButton implements BookComponent {
     private Component label;
 
     public BookButton(String label, ButtonStyle style, ClickEvent event) {
-        this.label = Component.text(style.leftBorder + label + style.rightBorder)
-                .color(style.color)
+        this.label = Component.text(style.left() + label + style.right())
+                .color(style.color())
                 .clickEvent(event);
     }
 
     public BookButton(String label, String description, ButtonStyle style, ClickEvent event) {
-        this.label = Component.text(style.leftBorder + label + style.rightBorder)
-                .color(style.color)
+        this.label = Component.text(style.left() + label + style.right())
+                .color(style.color())
                 .clickEvent(event)
                 .hoverEvent(HoverEvent.showText(Component.text(description)));
     }
@@ -27,6 +27,7 @@ public class BookButton implements BookComponent {
     public static BookButton callback(String label, String description, ButtonStyle style, ClickCallback<Audience> callback) {
         return new BookButton(label, description, style, ClickEvent.callback(callback));
     }
+
     public static BookButton callback(String label, ButtonStyle style, ClickCallback<Audience> callback) {
         return callback(label, "", style, callback);
     }

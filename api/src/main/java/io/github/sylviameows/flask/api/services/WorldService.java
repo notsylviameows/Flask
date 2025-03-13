@@ -10,7 +10,6 @@ import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.util.SchedulerUtil;
 import io.github.sylviameows.flask.api.util.WorldProperties;
 import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
 import org.bukkit.event.world.WorldLoadEvent;
 
 import java.io.IOException;
@@ -51,7 +50,6 @@ public interface WorldService {
     default SlimeWorld useTemplate(SlimeWorld template) {
         return useTemplate(template, UUID.randomUUID().toString());
     }
-
 
     /**
      * Generates a temporary world that is an exact copy of the found "template" world. This world will not be saved.
@@ -113,8 +111,8 @@ public interface WorldService {
             try {
                 var world = readWorld(name, readOnly, properties);
                 promise.complete(world);
-            } catch (Exception exception) {
-                promise.completeExceptionally(exception);
+            } catch (CorruptedWorldException | NewerFormatException | UnknownWorldException | IOException e) {
+                promise.completeExceptionally(e);
             }
         });
 
@@ -130,6 +128,7 @@ public interface WorldService {
     default SlimeWorld loadWorld(SlimeWorld world, boolean callEvent) {
         return slime.loadWorld(world, callEvent);
     }
+
     /**
      * Loads a world into the server from memory. Must be done synchronously.
      * @param world the deserialized world to load, obtained from {@link WorldService#readWorld(String, boolean, SlimePropertyMap)}.

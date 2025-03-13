@@ -1,20 +1,18 @@
 package io.github.sylviameows.duels.basic;
 
-import io.github.sylviameows.flask.api.game.Lobby;
-import io.github.sylviameows.flask.api.game.Phase;
+import io.github.sylviameows.flask.api.annotations.FlaskEvent;
+import io.github.sylviameows.flask.api.game.phase.ListenerPhase;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ExamplePlayingPhase implements Phase {
+public class ExamplePlayingPhase extends ListenerPhase {
     private final Player playerA;
     private final Player playerB;
 
     private final @NotNull ExampleEndingPhase nextPhase;
-
-    private Lobby<?> parent;
 
     public ExamplePlayingPhase(Player playerA, Player playerB) {
         this.playerA = playerA;
@@ -24,30 +22,24 @@ public class ExamplePlayingPhase implements Phase {
     }
 
     @Override
-    public void onEnabled(Lobby<?> parent) {
-        this.parent = parent;
-    }
-
-    @Override
-    public void onDisabled() {
-
-    }
-    @Override
     public void onPlayerLeave(Player player) {
-        if (player == playerA) nextPhase.setWinner(playerB);
-        else nextPhase.setWinner(playerA);
-        parent.nextPhase();
+        if (player == playerA) {
+            nextPhase.setWinner(playerB);
+        } else {
+            nextPhase.setWinner(playerA);
+        }
+        getLobby().nextPhase();
     }
 
-    @EventHandler
-    private void onDeath(EntityDeathEvent event) {
+    @FlaskEvent
+    public void onDeath(EntityDeathEvent event) {
         if (event.getEntity() instanceof Player player) {
             if (player == playerA) {
                 nextPhase.setWinner(playerB);
-                parent.nextPhase();
+                getLobby().nextPhase();
             } else if (player == playerB) {
                 nextPhase.setWinner(playerA);
-                parent.nextPhase();
+                getLobby().nextPhase();
             } else {
                 return;
             }

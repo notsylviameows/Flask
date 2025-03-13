@@ -2,7 +2,7 @@ package io.github.sylviameows.flask.api.game;
 
 import io.github.sylviameows.flask.api.FlaskPlugin;
 import io.github.sylviameows.flask.api.game.map.MapManager;
-import io.github.sylviameows.flask.api.map.FlaskMap;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import io.github.sylviameows.flask.api.map.GameMap;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -15,7 +15,7 @@ public abstract class Game<T extends GameMap> {
     private final Settings<T> settings;
     private final Queue<?> queue;
 
-    private NamespacedKey key;
+    private NamespacedKey identifier;
 
     protected Game(FlaskPlugin plugin, Settings<T> settings) {
         this.plugin = plugin;
@@ -33,13 +33,17 @@ public abstract class Game<T extends GameMap> {
     }
 
     public boolean register(String key) {
-        if (this.key != null) return false;
-        this.key = new NamespacedKey(plugin, key);
+        if (this.identifier != null) {
+            return false;
+        }
+
+        this.identifier = new NamespacedKey(plugin, key);
         plugin.getFlaskAPI().getGameRegistry().add(this);
         return true;
     }
 
     abstract public Lobby<?> createLobby(List<Player> players);
+
     abstract public Phase initialPhase();
 
     abstract public MapManager<T> getMapManager();
@@ -47,12 +51,15 @@ public abstract class Game<T extends GameMap> {
     public Settings<T> getSettings() {
         return settings;
     }
+
     public Queue<?> getQueue() {
         return queue; 
     }
-    public NamespacedKey getKey() {
-        return key;
+
+    public NamespacedKey getIdentifier() {
+        return identifier;
     }
+
     public FlaskPlugin getPlugin() {
         return plugin;
     }

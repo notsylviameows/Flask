@@ -9,8 +9,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import java.io.File;
-
 @CommandProperties(label = "setspawn", permission = "flask.setspawn")
 public class SetSpawnCommand extends FlaskCommand {
     @Override
@@ -19,7 +17,7 @@ public class SetSpawnCommand extends FlaskCommand {
         Location location;
         try {
             location = ((Entity) sender).getLocation();
-        } catch (Exception e) {
+        } catch (ClassCastException e) {
             ms.sendMessage(sender, MessageService.MessageType.ERROR, "not_player");
             return 0;
         }

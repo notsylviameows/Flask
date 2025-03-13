@@ -14,8 +14,6 @@ import org.bukkit.entity.Player;
 @CommandProperties(label = "session")
 public class SessionSubcommand extends FlaskCommand {
     public SessionSubcommand() {
-        super();
-
         addSubCommand(new OpenSession());
         addSubCommand(new CloseSession());
     }

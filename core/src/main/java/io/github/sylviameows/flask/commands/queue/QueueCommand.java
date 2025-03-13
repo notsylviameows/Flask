@@ -10,9 +10,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 @CommandProperties(label = "queue", aliases = {"q"}, permission = "flask.queue")
 public class QueueCommand extends FlaskCommand {
     public QueueCommand() {
-        super();
-        subCommands.add(new JoinSubcommand());
-        subCommands.add(new LeaveSubcommand());
+        addSubCommand(new JoinSubcommand());
+        addSubCommand(new LeaveSubcommand());
     }
 
     @Override

@@ -9,8 +9,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 @CommandProperties(label = "editor", aliases = {"e", "edit"}, permission = "flask.editor")
 public class EditorCommand extends FlaskCommand{
     public EditorCommand() {
-        super();
-
         addSubCommand(new SessionSubcommand());
     }
 

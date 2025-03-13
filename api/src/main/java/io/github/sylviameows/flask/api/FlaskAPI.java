@@ -1,5 +1,6 @@
 package io.github.sylviameows.flask.api;
 
+import io.github.sylviameows.flask.api.events.FlaskDispatcher;
 import io.github.sylviameows.flask.api.manager.PlayerManager;
 import io.github.sylviameows.flask.api.registry.GameRegistry;
 import io.github.sylviameows.flask.api.services.MessageService;
@@ -10,9 +11,14 @@ import org.jetbrains.annotations.ApiStatus;
 
 public interface FlaskAPI {
     GameRegistry getGameRegistry();
+
     PlayerManager getPlayerManager();
+
     WorldService getWorldService();
+
     MessageService getMessageService();
+
+    FlaskDispatcher getDispatcher();
 
     Plugin getPlugin();
 
@@ -23,13 +29,13 @@ public interface FlaskAPI {
     }
 
     @ApiStatus.Internal
-    public static class Holder {
+    final class Holder {
         private static FlaskAPI INSTANCE;
+
+        private Holder() {}
+
         public static void setInstance(FlaskAPI api) {
             INSTANCE = api;
-        }
-
-        public Holder() {
         }
     }
 }

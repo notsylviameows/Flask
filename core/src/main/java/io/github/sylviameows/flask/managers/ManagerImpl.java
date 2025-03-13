@@ -1,13 +1,12 @@
 package io.github.sylviameows.flask.managers;
 
 import io.github.sylviameows.flask.api.manager.Manager;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 abstract class ManagerImpl<T> implements Manager<T> {
-    protected final Map<String, T> map;
+    private final Map<String, T> map;
 
     protected ManagerImpl() {
         this.map = new ConcurrentHashMap<>();
@@ -23,5 +22,9 @@ abstract class ManagerImpl<T> implements Manager<T> {
 
     public T remove(String key) {
         return map.remove(key);
+    }
+
+    protected Map<String, T> map() {
+        return map;
     }
 }

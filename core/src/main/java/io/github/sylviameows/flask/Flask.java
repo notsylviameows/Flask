@@ -2,6 +2,8 @@ package io.github.sylviameows.flask;
 
 import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.FlaskPlugin;
+import io.github.sylviameows.flask.api.Palette;
+import io.github.sylviameows.flask.api.events.FlaskDispatcher;
 import io.github.sylviameows.flask.api.manager.PlayerManager;
 import io.github.sylviameows.flask.api.registry.GameRegistry;
 import io.github.sylviameows.flask.api.services.MessageService;
@@ -11,6 +13,7 @@ import io.github.sylviameows.flask.commands.editor.EditorCommand;
 import io.github.sylviameows.flask.commands.hologram.HologramCommand;
 import io.github.sylviameows.flask.commands.queue.QueueCommand;
 import io.github.sylviameows.flask.hub.holograms.GameHologram;
+import io.github.sylviameows.flask.listeners.FlaskDispatcherImpl;
 import io.github.sylviameows.flask.listeners.JoinListener;
 import io.github.sylviameows.flask.listeners.LeaveListener;
 import io.github.sylviameows.flask.listeners.RightClickEntity;
@@ -40,10 +43,11 @@ import java.util.Random;
  * The main plugin file, where access to all necessary information is given.
  */
 public class Flask extends FlaskPlugin implements FlaskAPI {
-    public static ComponentLogger logger;
+    private static ComponentLogger logger;
     private static MessageServiceImpl messageService;
     private static WorldService worldService;
     private static Flask instance;
+    private static FlaskDispatcherImpl dispatcher;
 
     @Override
     public void onEnable() {
@@ -60,8 +64,10 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
         JoinListener.register(this);
         LeaveListener.register(this);
 
+        Flask.dispatcher = new FlaskDispatcherImpl();
         Flask.messageService = new MessageServiceImpl(this);
         Flask.worldService = new FileWorldService();
+
         // commands
         registerCommands();
 
@@ -75,7 +81,6 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     public void onDisable() {
         purgeFlaskEntities();
     }
-
 
     public void registerCommands() {
         var lifecycle = this.getLifecycleManager();
@@ -157,6 +162,11 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     }
 
     @Override
+    public FlaskDispatcher getDispatcher() {
+        return dispatcher;
+    }
+
+    @Override
     public Plugin getPlugin() {
         return this;
     }
@@ -164,15 +174,23 @@ public class Flask extends FlaskPlugin implements FlaskAPI {
     @Override
     public Location getSpawnLocation() {
         Location location = getConfig().getLocation("spawn_location");
-        if (location != null) return location;
+        if (location != null) {
+            return location;
+        }
 
         World world = Bukkit.getWorld("world");
-        if (world == null) world = Bukkit.getWorlds().getFirst();
+        if (world == null) {
+            world = Bukkit.getWorlds().getFirst();
+        }
         return world.getSpawnLocation();
     }
 
     @Override
     public FlaskAPI getFlaskAPI() {
         return this;
+    }
+
+    public static ComponentLogger logger() {
+        return logger;
     }
 }

@@ -1,14 +1,13 @@
 package io.github.sylviameows.flask.api.game;
 
-import io.github.sylviameows.flask.api.FlaskAPI;
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.annotations.GameProperties;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 import io.github.sylviameows.flask.api.map.GameMap;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -55,12 +54,15 @@ public final class Settings<T extends GameMap> {
     public String getName() {
         return name;
     }
+
     public String getDescription() {
         return description;
     }
+
     public TextColor getColor() {
         return color;
     }
+
     public Material getIcon() {
         return icon;
     }
@@ -68,6 +70,7 @@ public final class Settings<T extends GameMap> {
     public Integer getMaxPlayers() {
         return maxPlayers;
     }
+
     public Integer getMinPlayers() {
         return minPlayers;
     }
@@ -75,13 +78,14 @@ public final class Settings<T extends GameMap> {
     public Class<T> getMapClass() {
         return mapClass;
     }
+
     public T getFreshMap(String id) {
         try {
             var constructor = mapClass.getConstructor(String.class);
             if (constructor.trySetAccessible()) {
                 return constructor.newInstance(id);
             }
-        } catch (Exception e) {
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
@@ -144,7 +148,6 @@ public final class Settings<T extends GameMap> {
                 .setMinPlayers(min)
                 .build();
     }
-
 
     public static class SettingsBuilder<T extends GameMap> {
         // display options

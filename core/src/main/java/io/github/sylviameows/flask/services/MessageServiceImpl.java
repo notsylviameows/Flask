@@ -8,6 +8,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -26,7 +27,6 @@ public class MessageServiceImpl implements MessageService {
     public MessageServiceImpl(Flask flask) {
         config = getConfig(flask);
 
-
         init();
     }
 
@@ -41,17 +41,17 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private void init() {
-        var format = config.getString("format");
+        String format = config.getString("format");
         if (format != null && format.equalsIgnoreCase("legacy")) {
             serializer = LegacyComponentSerializer.legacyAmpersand();
         } else {
             serializer = MiniMessage.miniMessage();
         }
 
-        var colors = config.getConfigurationSection("colors");
-        if (colors != null) {
-            for (var key : colors.getKeys(false)) {
-                String value = colors.getString(key);
+        ConfigurationSection configColors = config.getConfigurationSection("colors");
+        if (configColors != null) {
+            for (String key : configColors.getKeys(false)) {
+                String value = configColors.getString(key);
                 this.colors.put(key, value);
             }
         }
@@ -83,16 +83,6 @@ public class MessageServiceImpl implements MessageService {
         sendRawMessage(sender, MessageType.STANDARD, raw);
     }
 
-    private void sendRawMessage(CommandSender sender, MessageType type, String raw) {
-        Component component = serializer.deserialize(raw);
-        component = switch (type) {
-            case ERROR -> errorPrefix.append(component);
-            default -> prefix.append(component);
-        };
-
-        sender.sendMessage(component);
-    }
-
     @Override
     public void sendMessage(CommandSender sender, MessageType type, String key) {
         sendRawMessage(sender, type, getMessage(type, key));
@@ -103,6 +93,17 @@ public class MessageServiceImpl implements MessageService {
         var raw = getMessage(type,key);
         raw = raw.replaceAll("\\$arg", "%s");
         sendRawMessage(sender, type, String.format(raw, params));
+    }
+
+    private void sendRawMessage(CommandSender sender, MessageType type, String raw) {
+        Component component = serializer.deserialize(raw);
+        if (type == MessageType.ERROR) {
+            component = errorPrefix.append(component);
+        } else {
+            component = prefix.append(component);
+        }
+
+        sender.sendMessage(component);
     }
 
     // END OF GENERALIZED FUNCTIONS

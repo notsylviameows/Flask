@@ -16,8 +16,7 @@ public final class Duels extends FlaskPlugin {
             flask = api;
         }
 
-        new ExampleGame(this).register("sword");
-
+        new ExampleGame(this).register("duel");
     }
 
     @Override

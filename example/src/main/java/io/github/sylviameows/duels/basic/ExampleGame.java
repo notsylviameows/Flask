@@ -2,9 +2,10 @@ package io.github.sylviameows.duels.basic;
 
 import io.github.sylviameows.flask.api.FlaskPlugin;
 import io.github.sylviameows.flask.api.annotations.GameProperties;
-import io.github.sylviameows.flask.api.game.*;
+import io.github.sylviameows.flask.api.game.Game;
+import io.github.sylviameows.flask.api.game.Lobby;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import io.github.sylviameows.flask.api.game.map.MapManager;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -37,7 +38,9 @@ public class ExampleGame extends Game<ExampleMap> {
 
     @Override
     public MapManager<ExampleMap> getMapManager() {
-        if (mm == null) mm = new MapManager<>(this, ExampleMap.class);
+        if (mm == null) {
+            mm = new MapManager<>(this, ExampleMap.class);
+        }
         return mm;
     }
 }

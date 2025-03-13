@@ -1,8 +1,6 @@
 package io.github.sylviameows.flask.editor.book;
 
-import io.github.sylviameows.flask.Flask;
 import io.github.sylviameows.flask.api.game.Game;
-import io.github.sylviameows.flask.api.map.FlaskMap;
 import io.github.sylviameows.flask.api.map.GameMap;
 import io.github.sylviameows.flask.editor.EditorUtilities;
 import io.github.sylviameows.flask.editor.book.components.variable.BookOption;
@@ -19,12 +17,10 @@ public class EditorBook {
     private final Game<? extends GameMap> game;
     private final GameMap map;
 
-
     public EditorBook(Game<? extends GameMap> game, GameMap map) {
         this.game = game;
         this.map = map;
     }
-
 
     public void open(Player player){
         var clazz = map.getClass();
@@ -58,23 +54,25 @@ public class EditorBook {
             count++;
 
             options.removeFirst();
-        };
+        }
         pages.add(page);
 
         var book = Book.book(Component.text("Editor Book"), Component.text("Flask"), pages);
         player.openBook(book);
 
-//        BooleanOption option = null;
-//        try {
-//            option = new BooleanOption(FlaskMap.class.getDeclaredField("spectators"));
-//        } catch (NoSuchFieldException e) {
-//            throw new RuntimeException(e);
-//        }
-//        var component = option.label(new FlaskMap());
-//
-//        var book = Book.book(Component.text("Editor Book"), Component.text("Flask"), component);
-//
-//        player.openBook(book);
+        /*
+        BooleanOption option = null;
+        try {
+            option = new BooleanOption(FlaskMap.class.getDeclaredField("spectators"));
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        var component = option.label(new FlaskMap());
+
+        var book = Book.book(Component.text("Editor Book"), Component.text("Flask"), component);
+
+        player.openBook(book);
+        */
     }
 
 }

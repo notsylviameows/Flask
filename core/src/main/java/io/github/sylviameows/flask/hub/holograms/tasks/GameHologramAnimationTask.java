@@ -8,11 +8,11 @@ import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 abstract public class GameHologramAnimationTask extends BukkitRunnable {
-    protected final Plugin plugin;
-    protected final TextDisplay display;
-    protected final int tick;
-    protected final int end;
-    protected final float start;
+    private final Plugin plugin;
+    private final TextDisplay display;
+    private final int tick;
+    private final int end;
+    private final float start;
 
     protected GameHologramAnimationTask(TextDisplay display, int tick, int end, float start, Plugin plugin) {
         this.plugin = plugin;
@@ -44,4 +44,23 @@ abstract public class GameHologramAnimationTask extends BukkitRunnable {
         return 1 - Math.pow(1-percent, 4);
     }
 
+    protected Plugin plugin() {
+        return plugin;
+    }
+
+    protected TextDisplay display() {
+        return display;
+    }
+
+    protected int tick() {
+        return tick;
+    }
+
+    protected int end() {
+        return end;
+    }
+
+    protected float start() {
+        return start;
+    }
 }

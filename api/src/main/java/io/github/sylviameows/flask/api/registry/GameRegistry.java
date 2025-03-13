@@ -5,10 +5,12 @@ import org.bukkit.NamespacedKey;
 
 import java.util.List;
 
-public interface GameRegistry extends Registry<Game> {
-    Game add(Game game);
-    Game remove(Game game);
+public interface GameRegistry extends Registry<Game<?>> {
+    Game<?> add(Game<?> game);
+
+    Game<?> remove(Game<?> game);
 
     List<NamespacedKey> keys();
-    Game findByName(String name);
+
+    Game<?> findByName(String name);
 }

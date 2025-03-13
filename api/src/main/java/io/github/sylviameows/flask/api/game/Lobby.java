@@ -1,97 +1,94 @@
 package io.github.sylviameows.flask.api.game;
 
 import io.github.sylviameows.flask.api.FlaskAPI;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Lobby<G extends Game> {
-    protected final G parent;
+public class Lobby<G extends Game<?>> {
+    private final G parent;
 
-    public List<Player> players;
+    private List<Player> players;
     private @NotNull Phase phase;
 
     private World world;
 
     public Lobby(G parent) {
-        this.parent = parent;
-        this.players = new ArrayList<>();
-
-        this.phase = parent.initialPhase();
-        Bukkit.getPluginManager().registerEvents(this.phase, parent.getPlugin());
-        this.phase.onEnabled(this);
+        this(parent, new ArrayList<>());
     }
 
     public Lobby(G parent, List<Player> players) {
         this.parent = parent;
         this.players = players;
 
-        var api = parent.getPlugin().getFlaskAPI();
+        FlaskAPI api = parent.getPlugin().getFlaskAPI();
         players.forEach(player -> api.getPlayerManager().get(player).setLobby(this));
 
         this.phase = parent.initialPhase();
-        Bukkit.getPluginManager().registerEvents(this.phase, parent.getPlugin());
         this.phase.onEnabled(this);
     }
 
-    // todo: call function in phase
     public void addPlayer(Player player) {
-        var api = parent.getPlugin().getFlaskAPI();
+        FlaskAPI api = parent.getPlugin().getFlaskAPI();
         api.getPlayerManager().get(player).setLobby(this);
         players.add(player);
         phase.onPlayerJoin(player);
     }
 
     public void removePlayer(Player player) {
-        var api = parent.getPlugin().getFlaskAPI();
+        FlaskAPI api = parent.getPlugin().getFlaskAPI();
         api.getPlayerManager().get(player).setLobby(null);
         players.remove(player);
         phase.onPlayerLeave(player);
     }
 
     public void closeLobby() {
-        phase.onDisabled();
-        HandlerList.unregisterAll(phase);
+        closeLobby(player -> {});
+    }
 
-        // todo: replace with a requeue feature?
+    public void closeLobby(Consumer<Player> consumer) {
+        phase.onDisabled();
+
         players.forEach(player -> {
-            parent.getQueue().removePlayer(player);
-            player.teleportAsync(FlaskAPI.instance().getSpawnLocation());
-            player.setGameMode(GameMode.ADVENTURE);
-            player.setHealth(20.0);
-            player.setSaturation(10f);
-            player.setFoodLevel(20);
+            resetPlayer(player);
+            consumer.accept(player);
         });
 
         Bukkit.getScheduler().runTaskLater(FlaskAPI.instance().getPlugin(), () -> {
             Bukkit.unloadWorld(world, false);
-        }, 200L);
+        }, 200L /* 10 SECONDS */);
     }
 
-    public void closeLobby(Consumer<Player> consumer) {
-        players.forEach(consumer);
-        closeLobby();
+    // todo: add a requeue feature?
+    public void resetPlayer(Player player) {
+        parent.getQueue().removePlayer(player);
+        player.teleportAsync(FlaskAPI.instance().getSpawnLocation());
+        player.setGameMode(GameMode.ADVENTURE);
+
+        player.heal(Integer.MAX_VALUE);
+        player.setSaturation(10f);
+        player.setFoodLevel(20);
     }
 
+    public void setPhase(@NotNull Phase phase) {
+        this.phase = phase;
+    }
 
-    public Phase getPhase() {
+    public @NotNull Phase getPhase() {
         return phase;
     }
-    public void updatePhase(@NotNull Phase phase) {
+
+    public void updatePhase(@NotNull Phase newPhase) {
         this.phase.onDisabled();
-        HandlerList.unregisterAll(this.phase);
-
-        this.phase = phase;
-
+        this.phase = newPhase;
         this.phase.onEnabled(this);
-        Bukkit.getPluginManager().registerEvents(this.phase, parent.getPlugin());
     }
 
     public void nextPhase() {
@@ -105,6 +102,14 @@ public class Lobby<G extends Game> {
 
     public G getParent() {
         return parent;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 
     public World getWorld() {

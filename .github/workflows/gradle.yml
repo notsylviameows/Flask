@@ -50,12 +50,23 @@ jobs:
       with:
         name: Flask
     - name: Publish Release
+      if: env.version != env.latest
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: $${ env.version }}
+        prerelease: false
+        title: ${{ env.version }}
+        files: |
+          *.jar
+    - name: Publish Beta
+      if: env.version == env.latest
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
-        prerelease: ${{ env.version == env.latest }}
-        title: ${{ env.version }}${{ env.version == env.latest && '-${{ github.sha }}' || '' }}
+        prerelease: true
+        title: ${{ env.version }}-${{ github.sha }}
         files: |
           *.jar
     - name: Update Version

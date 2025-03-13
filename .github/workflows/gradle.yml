@@ -43,11 +43,11 @@ jobs:
     env:
       version: ${{ needs.build.outputs.version }}
       latest: ${{ vars.LATEST_VERSION }}
-    if: env.version != env.latest
     steps:
     - name: Get Version
       run: 'echo version : ${{ env.version }} : ${{ env.latest }}'
     - name: Download Artifact
+      if: env.version != env.latest
       uses: actions/download-artifact@v4
       with:
         name: Flask

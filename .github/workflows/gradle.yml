@@ -54,8 +54,8 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
-        prerelease: ${{ env.version != env.latest }}
-        title: ${{ env.version }}
+        prerelease: ${{ env.version == env.latest }}
+        title: ${{ env.version }}${{ env.version == env.latest && '-${{ github.sha }}' || '' }}
         files: |
           *.jar
     - name: Update Version

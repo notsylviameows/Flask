@@ -13,7 +13,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v4.1.9
+        uses: actions/download-artifact@v4
         with:
           name: Flask
       - name: Display Files

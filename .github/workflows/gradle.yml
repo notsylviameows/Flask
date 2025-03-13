@@ -43,7 +43,7 @@ jobs:
     env:
       version: ${{ needs.build.outputs.version }}
       latest: ${{ vars.LATEST_VERSION }}
-    if: ${{ env.version != env.latest }}
+    if: env.version != env.latest
     steps:
     - name: Get Version
       run: 'echo version : ${{ env.version }} : ${{ env.latest }}'

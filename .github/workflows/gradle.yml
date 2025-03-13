@@ -27,7 +27,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Expose Version
-      run: echo "VERSION_NAME=$( ./gradlew -q app:version )" >> $GITHUB_ENV
+      run: echo "VERSION_NAME=$( ./gradlew -q version )" >> $GITHUB_ENV
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:

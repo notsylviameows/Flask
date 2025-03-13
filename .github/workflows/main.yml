@@ -17,5 +17,6 @@ jobs:
         with:
           name: Flask
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ env.REPO_TOKEN }}
       - name: Display Files
         run: ls -R

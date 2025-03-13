@@ -1,8 +1,5 @@
 name: Build
 
-env:
-  VERSION_NAME: 'test'
-
 on:
   push:
     branches: [ "main" ]
@@ -30,7 +27,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Expose Version
-      run: echo "VERSION_NAME=$( ./gradlew -q version )" >> $GITHUB_ENV
+      run: echo "VERSION_NAME=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_ENV
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -39,6 +36,7 @@ jobs:
     
   release:
     runs-on: ubuntu-latest
+    environment: publish
     needs: build
     steps:
     - name: Get Version

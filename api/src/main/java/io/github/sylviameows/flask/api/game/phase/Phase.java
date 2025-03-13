@@ -1,11 +1,10 @@
-package io.github.sylviameows.flask.api.game;
+package io.github.sylviameows.flask.api.game.phase;
 
 import io.github.sylviameows.flask.api.events.FlaskListener;
+import io.github.sylviameows.flask.api.game.Lobby;
 import org.bukkit.entity.Player;
 
-public interface Phase extends FlaskListener {
-    /* TODO */
-
+sealed public interface Phase extends FlaskListener permits ListenerPhase, ModularPhase {
     void onEnabled(Lobby<?> parent);
 
     void onDisabled();

@@ -2,6 +2,7 @@ package io.github.sylviameows.flask.api.game;
 
 import io.github.sylviameows.flask.api.FlaskPlugin;
 import io.github.sylviameows.flask.api.game.map.MapManager;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import io.github.sylviameows.flask.api.map.GameMap;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;

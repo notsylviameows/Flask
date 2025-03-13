@@ -2,8 +2,8 @@ package io.github.sylviameows.duels.basic;
 
 import io.github.sylviameows.flask.api.Palette;
 import io.github.sylviameows.flask.api.annotations.FlaskEvent;
-import io.github.sylviameows.flask.api.game.Lobby;
-import io.github.sylviameows.flask.api.game.Phase;
+import io.github.sylviameows.flask.api.game.phase.ListenerPhase;
+import io.github.sylviameows.flask.api.game.phase.Phase;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -17,24 +17,20 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.time.Duration;
 
-public class ExampleEndingPhase implements Phase {
+public class ExampleEndingPhase extends ListenerPhase {
     private Player winner;
-
-    private Lobby<?> parent;
 
     public void setWinner(Player player) {
         this.winner = player;
     }
 
     @Override
-    public void onEnabled(Lobby<?> lobby) {
-        this.parent = lobby;
-
-        lobby.getPlayers().forEach(this::ending);
+    public void enabled() {
+        getLobby().getPlayers().forEach(this::ending);
 
         // close lobby after 5.
-        Bukkit.getScheduler().runTaskLater(lobby.getParent().getPlugin(), () -> {
-            lobby.closeLobby(player -> {
+        Bukkit.getScheduler().runTaskLater(getLobby().getParent().getPlugin(), () -> {
+            getLobby().closeLobby(player -> {
                 player.setGameMode(GameMode.ADVENTURE);
             });
         }, 100L);
@@ -43,7 +39,7 @@ public class ExampleEndingPhase implements Phase {
     private void ending(Player player) {
         player.getInventory().clear();
 
-        Component prefix = Component.text("SYSTEM › ").color(parent.getParent().getSettings().getColor());
+        Component prefix = Component.text("SYSTEM › ").color(getLobby().getParent().getSettings().getColor());
         player.sendMessage(prefix
                 .append(Component.text(winner.getName()).color(Palette.WHITE))
                 .append(Component.text(" won the duel!").color(Palette.GRAY))
@@ -72,15 +68,15 @@ public class ExampleEndingPhase implements Phase {
     }
 
     @Override
-    public void onDisabled() {
-        this.parent.getPlayers().forEach(player -> {
+    protected void disabled() {
+        this.getLobby().getPlayers().forEach(player -> {
             player.setGameMode(GameMode.ADVENTURE);
 
             var lobby = Bukkit.getWorld("world");
             player.teleport(new Location(lobby, 0.0, -60.0, 0.0));
         });
 
-        var world = this.parent.getWorld();
+        var world = getLobby().getWorld();
         if (world != null) {
             Bukkit.unloadWorld(world.getName(), false);
         }

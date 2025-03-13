@@ -8,7 +8,7 @@ on:
       - 'main'
 
 jobs:
-  upload:
+  download:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
@@ -16,5 +16,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Flask
+          run-id: ${{ github.event.workflow_run.id }}
       - name: Display Files
         run: ls -R

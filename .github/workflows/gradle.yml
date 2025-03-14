@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
-      trigger: ${{ steps.trigger.outputs.release }}
+      type: ${{ steps.trigger.outputs.type }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
@@ -55,16 +55,19 @@ jobs:
         tag: v${{steps.version.outputs.version}}
     - name: Trigger Release
       id: trigger
-      if: ${{ steps.check-tag.outputs.exists == 'false' }}
-      run: echo "release=true" >> $GITHUB_OUTPUT
+      env: 
+        snapshot: ${{ contains(steps.version.outputs.version, SNAPSHOT) }}
+      if: ${{ steps.check-tag.outputs.exists == 'false' || env.snapshot == 'true' }}
+      run: echo "type=${{env.snapshot && snapshot || release }}" >> $GITHUB_OUTPUT
 
   release:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ needs.build.outputs.trigger == 'true' }}
+    if: ${{ needs.build.outputs.type != '' }}
     env:
       # obtained from build action.
       version: ${{ needs.build.outputs.version }}
+      type: ${{ needs.build.outputs.type }}
     steps:
     # download the artifact generated from building.
     - name: Download Artifact
@@ -76,8 +79,7 @@ jobs:
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: 'v${{ env.version }}'
-        prerelease: false
-        draft: true
+        prerelease: ${{ type == 'snapshot' }}
         title: 'Flask ${{ env.version }}'
         files: |
           *.jar

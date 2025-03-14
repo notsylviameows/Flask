@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      version: ${{ steps.version.outputs.result }}
       type: ${{ steps.trigger.outputs.type }}
     steps:
     - uses: actions/checkout@v4
@@ -30,16 +30,18 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
       # store the build version to check if this is a new version at release.
-    - name: Expose Version
+    - name: Get Version
       if: ${{ github.event_name == 'push' }}
       id: version
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
     - name: Sort Build
+      env:
+        version: ${{ steps.verion.outputs.version }}
       run: |
         mkdir ./output/
-        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{steps.version.outputs.version}}.jar
-        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{steps.version.outputs.version}}.jar
-        mv ./example/build/libs/example-*.jar ./output/example-${{steps.version.outputs.version}}.jar
+        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{env.version}}.jar
+        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{env.version}}.jar
+        mv ./example/build/libs/example-*.jar ./output/example-${{env.version}}.jar
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -47,12 +49,21 @@ jobs:
         path: ./output/*.jar
 
     # check if a version tag exists for this version
+    - name: Parse Version
+      env:
+        version: ${{ steps.verion.outputs.version }}
+      if: ${{ github.event_name == 'push' }}
+      uses: bluwy/substitute-string-action@v3
+      id: parsed
+      with:
+        _input-text: ${{ env.version }}
+        -SNAPSHOT: ''
     - name: Check Update
       if: ${{ github.event_name == 'push' }}
       uses: mukunku/tag-exists-action@v1.6.0
       id: check-tag
       with: 
-        tag: v${{steps.version.outputs.version}}
+        tag: v${{steps.parsed.outputs.result}}
     - name: Trigger Release
       id: trigger
       env: 

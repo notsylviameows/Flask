@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     group = "io.github.sylviameows"
-    version = "0.10.3"
+    version = "0.10.4"
 
     apply(plugin = "checkstyle")
 

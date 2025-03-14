@@ -41,16 +41,19 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     needs: build
+    if: github.event_name == "push"
     env:
       version: ${{ needs.build.outputs.version }}
-      latest: ${{ vars.LATEST_VERSION }}
     steps:
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
         name: Flask
+    - name: Fetch Latest Version
+      uses: "actions-ecosystem/action-get-latest-tag@v1"
+      id: latest
     - name: Publish Release
-      if: env.version != env.latest
+      if: env.version != steps.latest.outputs.tag
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -60,7 +63,7 @@ jobs:
         files: |
           *.jar
     - name: Publish Beta
-      if: env.version == env.latest
+      if: env.version == steps.latest.outputs.tag
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -69,6 +72,3 @@ jobs:
         title: ${{ env.version }}-${{ github.sha }}
         files: |
           *.jar
-    - name: Update Version
-      if: env.version != env.latest
-      run: echo "LATEST_VERSION=${{ env.version }}" >> $GITHUB_ENV

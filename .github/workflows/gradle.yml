@@ -45,9 +45,17 @@ jobs:
       with:
         name: Flask
         path: ./output/*.jar
+
+    # check if a version tag exists for this version
+    - name: Check If New Version
+      if: ${{ github.event_name == 'push' }}
+      uses: mukunku/tag-exists-action@v1.6.0
+      id: check-tag
+      with: 
+        tag: ${{ env.version }}
     - name: Trigger Release
       id: trigger
-      if: ${{ github.event_name == 'push' }}
+      if: ${{ steps.check-tag.outputs.exists == 'false' }}
       run: echo "release=yes" >> $GITHUB_OUTPUT
       
   release:
@@ -58,22 +66,12 @@ jobs:
       # obtained from build action.
       version: ${{ needs.build.outputs.version }}
     steps:
-    # check if a version tag exists for this version
-    - name: Check If New Version
-      uses: mukunku/tag-exists-action@v1.6.0
-      id: check-tag
-      with: 
-        tag: ${{ env.version }}
     # download the artifact generated from building.
     - name: Download Artifact
-      if: steps.check-tag.outputs.exists == 'false'
       uses: actions/download-artifact@v4
       with:
         name: Flask
-    # publish release when its a new version.
-    - run: ls -R ./
     - name: Publish Release
-      if: steps.check-tag.outputs.exists == 'false'
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"

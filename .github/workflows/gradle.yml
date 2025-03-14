@@ -34,7 +34,6 @@ jobs:
       id: version
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
     - name: Sort Build
-      shell: bash
       run: |
         mkdir ./output/
         mv ./api/build/libs/flask-api-*.jar ./output/

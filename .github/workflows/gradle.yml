@@ -33,11 +33,19 @@ jobs:
       if: ${{ github.event_name == 'push' }}
       id: version
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
+    - name: Sort Build
+      shell: bash
+      run: |
+        mkdir ./output/
+        mv ./api/build/libs/flask-api-*.jar ./output/
+        mv ./core/build/libs/flask-core-*-all.jar ./output/
+        mv ./example/build/libs/example-*.jar ./output/
+        rename 's/-all//g' ./output/*
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Flask
-        path: ./*/build/libs/flask-*.jar
+        path: ./output/*.jar
     
   release:
     runs-on: ubuntu-latest
@@ -48,17 +56,18 @@ jobs:
       # obtained from build action.
       version: ${{ needs.build.outputs.version }}
     steps:
-    # download the artifact generated from building.
-    - name: Download Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: Flask
     # check if a version tag exists for this version
     - name: Check If New Version
       uses: mukunku/tag-exists-action@v1.6.0
       id: check-tag
       with: 
         tag: ${{ env.version }}
+    # download the artifact generated from building.
+    - name: Download Artifact
+      if: steps.check-tag.outputs.exists == 'false'
+      uses: actions/download-artifact@v4
+      with:
+        name: Flask
     # publish release when its a new version.
     - name: Publish Release
       if: steps.check-tag.outputs.exists == 'false'
@@ -68,20 +77,5 @@ jobs:
         automatic_release_tag: ${{ env.version }}
         prerelease: false
         title: ${{ env.version }}
-        files: |
-          *.jar
-    # publish beta when the version hasn't changed.
-    - name: Get Short SHA
-      if: steps.check-tag.outputs.exists == 'true'
-      id: short-sha
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-    - name: Publish Beta
-      if: steps.check-tag.outputs.exists == 'true'
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: true
-        title: ${{ env.version }}-${{ steps.vars.outputs.sha_short }}
         files: |
           *.jar

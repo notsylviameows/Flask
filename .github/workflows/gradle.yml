@@ -60,7 +60,7 @@ jobs:
       uses: mukunku/tag-exists-action@v1.6.0
       id: check-tag
       with: 
-        tag: v${{steps.version.outputs.version }}
+        tag: v${{ steps.version.outputs.version }}
     - name: Trigger Release
       id: trigger
       env: 
@@ -68,7 +68,7 @@ jobs:
         snapshot: ${{ contains(steps.version.outputs.version, 'SNAPSHOT') }}
       # if it is, then we can trigger a release with the type snapshot.
       if: ${{ steps.check-tag.outputs.exists == 'false' || env.snapshot == 'true' }}
-      run: echo "type=${{env.snapshot && 'snapshot' || 'release' }}" >> $GITHUB_OUTPUT
+      run: echo "type=${{env.snapshot == 'true' && 'snapshot' || 'release' }}" >> $GITHUB_OUTPUT
 
   release:
     runs-on: ubuntu-latest

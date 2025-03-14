@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
-      latest: ${{ steps.latest.outputs.tag }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
@@ -29,6 +28,7 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
     - name: Build with Gradle
       run: ./gradlew build
+      # store the build version to check if this is a new version at release.
     - name: Expose Version
       if: ${{ github.event_name == 'push' }}
       id: version
@@ -45,17 +45,21 @@ jobs:
     needs: build
     if: ${{ github.event_name == 'push' }}
     env:
+      # obtained from build action.
       version: ${{ needs.build.outputs.version }}
     steps:
+    # download the artifact generated from building.
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
         name: Flask
+    # check if a version tag exists for this version
     - name: Check If New Version
       uses: mukunku/tag-exists-action@v1.6.0
       id: check-tag
       with: 
         tag: ${{ env.version }}
+    # publish release when its a new version.
     - name: Publish Release
       if: steps.check-tag.outputs.exists == 'false'
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -66,6 +70,11 @@ jobs:
         title: ${{ env.version }}
         files: |
           *.jar
+    # publish beta when the version hasn't changed.
+    - name: Get Short SHA
+      if: steps.check-tag.outputs.exists == 'true'
+      id: short-sha
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     - name: Publish Beta
       if: steps.check-tag.outputs.exists == 'true'
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -73,6 +82,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: ${{ env.version }}-${{ github.sha }}
+        title: ${{ env.version }}-${{ steps.vars.outputs.sha_short }}
         files: |
           *.jar

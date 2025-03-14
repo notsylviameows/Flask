@@ -71,6 +71,10 @@ jobs:
         files: |
           *.jar
     # publish beta when the version hasn't changed.
+    - name: Get Short SHA
+      if: steps.check-tag.outputs.exists == 'true'
+      id: short-sha
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     - name: Publish Beta
       if: steps.check-tag.outputs.exists == 'true'
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -78,6 +82,6 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: ${{ env.version }}-${{ github.sha }}
+        title: ${{ env.version }}-${{ steps.vars.outputs.sha_short }}
         files: |
           *.jar

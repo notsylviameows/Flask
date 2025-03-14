@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.result }}
+      version: ${{ steps.parsed.outputs.result }}
       type: ${{ steps.trigger.outputs.type }}
     steps:
     - uses: actions/checkout@v4
@@ -39,9 +39,9 @@ jobs:
         version: ${{ steps.verion.outputs.version }}
       run: |
         mkdir ./output/
-        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{env.version}}.jar
-        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{env.version}}.jar
-        mv ./example/build/libs/example-*.jar ./output/example-${{env.version}}.jar
+        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{ steps.verion.outputs.version }}.jar
+        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{ steps.verion.outputs.version }}.jar
+        mv ./example/build/libs/example-*.jar ./output/example-${{ steps.verion.outputs.version }}.jar
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -50,10 +50,9 @@ jobs:
 
     # check if a version tag exists for this version
     - name: Parse Version
-      env:
-        version: ${{ steps.verion.outputs.version }}
+      id: parsed
       if: ${{ github.event_name == 'push' }}
-      run: echo "result=$(echo ${${{env.version}}#-SNAPSHOT})" >> $GITHUB_ENV
+      run: echo "result=$(echo ${${{ steps.verion.outputs.version }}#-SNAPSHOT})" >> $GITHUB_ENV
     - name: Check Update
       if: ${{ github.event_name == 'push' }}
       uses: mukunku/tag-exists-action@v1.6.0

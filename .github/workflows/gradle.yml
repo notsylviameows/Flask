@@ -58,7 +58,7 @@ jobs:
       env: 
         snapshot: ${{ contains(steps.version.outputs.version, 'SNAPSHOT') }}
       if: ${{ steps.check-tag.outputs.exists == 'false' || env.snapshot == 'true' }}
-      run: echo "type=${{env.snapshot && snapshot || release }}" >> $GITHUB_OUTPUT
+      run: echo "type=${{env.snapshot && 'snapshot' || 'release' }}" >> $GITHUB_OUTPUT
 
   release:
     runs-on: ubuntu-latest

@@ -54,7 +54,7 @@ jobs:
       if: ${{ github.event_name == 'push' }}
       env:
         version: ${{ steps.version.outputs.version }}
-      run: echo "result=$(echo ${version#-SNAPSHOT})" >> $GITHUB_OUTPUT
+      run: echo "result=$(echo ${version//-SNAPSHOT/})" >> $GITHUB_OUTPUT
     - name: Check Update
       if: ${{ github.event_name == 'push' }}
       uses: mukunku/tag-exists-action@v1.6.0

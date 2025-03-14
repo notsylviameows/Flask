@@ -36,12 +36,12 @@ jobs:
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
     - name: Sort Build
       env:
-        version: ${{ steps.verion.outputs.version }}
+        version: ${{ steps.version.outputs.version }}
       run: |
         mkdir ./output/
-        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{ steps.verion.outputs.version }}.jar
-        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{ steps.verion.outputs.version }}.jar
-        mv ./example/build/libs/example-*.jar ./output/example-${{ steps.verion.outputs.version }}.jar
+        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{ env.version }}.jar
+        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{ env.version }}.jar
+        mv ./example/build/libs/example-*.jar ./output/example-${{ env.version }}.jar
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -52,7 +52,7 @@ jobs:
     - name: Parse Version
       id: parsed
       if: ${{ github.event_name == 'push' }}
-      run: echo "result=$(echo ${${{ steps.verion.outputs.version }}#-SNAPSHOT})" >> $GITHUB_ENV
+      run: echo "result=$(echo ${${{ steps.version.outputs.version }}#-SNAPSHOT})" >> $GITHUB_ENV
     - name: Check Update
       if: ${{ github.event_name == 'push' }}
       uses: mukunku/tag-exists-action@v1.6.0

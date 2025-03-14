@@ -84,6 +84,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: Flask
+    - name: Delete Version Beta
+      if: ${{ env.type == 'release' }}
+      uses: ClementTsang/delete-tag-and-release@v0.3.1
+      with:
+        delete_release: true
+        tag_name: 'v${{ env.version }}-SNAPSHOT'
     - name: Publish Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:

@@ -90,7 +90,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: 'v${{ env.version }}'
         prerelease: ${{ env.type == 'snapshot' }}
-        title: "Flask ${{ env.type == 'snapshot' && 'Beta' || '' }}${{ env.version }}"
+        title: "Flask ${{ env.type == 'snapshot' && 'Beta ' || '' }}${{ env.version }}"
         files: |
           *.jar
 

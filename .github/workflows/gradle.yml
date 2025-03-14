@@ -36,10 +36,9 @@ jobs:
     - name: Sort Build
       run: |
         mkdir ./output/
-        mv ./api/build/libs/flask-api-*.jar ./output/
-        mv ./core/build/libs/flask-core-*-all.jar ./output/
-        mv ./example/build/libs/example-*.jar ./output/
-        rename 's/-all//g' ./output/*
+        mv ./api/build/libs/flask-api-*.jar ./output/flask-api-${{steps.version.outputs.version}}.jar
+        mv ./core/build/libs/flask-core-*-all.jar ./output/flask-core-${{steps.version.outputs.version}}.jar
+        mv ./example/build/libs/example-*.jar ./output/example-${{steps.version.outputs.version}}.jar
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -77,4 +76,4 @@ jobs:
         prerelease: false
         title: ${{ env.version }}
         files: |
-          *.jar
+          ./output/*.jar

@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.parsed.outputs.result }}
+      version: ${{ steps.version.outputs.version }}
       type: ${{ steps.trigger.outputs.type }}
     steps:
     - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
       # store the build version to check if this is a new version at release.
-    - name: Get Version
+    - name: Expose Version
       if: ${{ github.event_name == 'push' }}
       id: version
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
@@ -49,18 +49,18 @@ jobs:
         path: ./output/*.jar
 
     # check if a version tag exists for this version
-    - name: Parse Version
-      id: parsed
-      if: ${{ github.event_name == 'push' }}
-      env:
-        version: ${{ steps.version.outputs.version }}
-      run: echo "result=$(echo ${version//-SNAPSHOT/})" >> $GITHUB_OUTPUT
+    # - name: Parse Version
+    #   id: parsed
+    #   if: ${{ github.event_name == 'push' }}
+    #   env:
+    #     version: ${{ steps.version.outputs.version }}
+    #   run: echo "result=$(echo ${version//-SNAPSHOT/})" >> $GITHUB_OUTPUT
     - name: Check Update
       if: ${{ github.event_name == 'push' }}
       uses: mukunku/tag-exists-action@v1.6.0
       id: check-tag
       with: 
-        tag: v${{steps.parsed.outputs.result}}
+        tag: v${{steps.version.outputs.version }}
     - name: Trigger Release
       id: trigger
       env: 

@@ -12,9 +12,6 @@ permissions:
     packages: "write"
     pull-requests: "read"
 
-env:
-  release: ${{ github.event_name == 'push' }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,7 +30,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Expose Current Version
-      if: env.release
+      if: ${{ github.event_name == 'push' }}
       id: version
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
     - name: Expose Last Version
@@ -52,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     needs: build
-    if: env.release
+    if: ${{ github.event_name == 'push' }}
     env:
       version: ${{ needs.build.outputs.version }}
       latest: ${{ needs.build.outputs.latest }}

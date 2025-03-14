@@ -29,16 +29,10 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Expose Current Version
+    - name: Expose Version
       if: ${{ github.event_name == 'push' }}
       id: version
       run: echo "version=$(${{github.workspace}}/gradlew -q version )" >> $GITHUB_OUTPUT
-    - name: Expose Last Version
-      if: ${{ github.event_name == 'push' }}
-      uses: "actions-ecosystem/action-get-latest-tag@v1"
-      id: latest
-      with:
-        semver_only: true
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -52,15 +46,18 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     env:
       version: ${{ needs.build.outputs.version }}
-      latest: ${{ needs.build.outputs.latest }}
     steps:
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
         name: Flask
-    - run: echo "${{env.latest}} | ${{env.version}}"
+    - name: Check If New Version
+      uses: mukunku/tag-exists-action@v1.6.0
+      id: check-tag
+      with: 
+        tag: ${{ env.version }}
     - name: Publish Release
-      if: env.version != env.latest
+      if: steps.check-tag.outputs.exists == 'false'
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -70,7 +67,7 @@ jobs:
         files: |
           *.jar
     - name: Publish Beta
-      if: env.version == env.latest
+      if: steps.check-tag.outputs.exists == 'true'
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"

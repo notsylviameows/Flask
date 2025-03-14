@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     needs: build
-    if: github.event_name == "push"
+    if: github.event_name == push
     env:
       version: ${{ needs.build.outputs.version }}
     steps:

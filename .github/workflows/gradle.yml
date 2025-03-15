@@ -87,6 +87,8 @@ jobs:
     - name: Delete Version Beta
       if: ${{ env.type == 'release' }}
       uses: ClementTsang/delete-tag-and-release@v0.3.1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       with:
         delete_release: true
         tag_name: 'v${{ env.version }}-SNAPSHOT'
